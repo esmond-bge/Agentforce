@@ -6,694 +6,417 @@ title: Chat with us
 <div markdown="0">
 
 <style>
-    :root {
-        --bge-navy: #003b5c;
-        --bge-text: #454545;
-        --bge-muted: #666666;
-        --bge-border: #dddddd;
-        --bge-panel: #ffffff;
-        --bge-close: #f4f4f4;
-        --bge-teal: #00b7a5;
-        --bge-purple: #7f3f98;
-        --bge-pink: #d5007f;
-        --bge-error: #9d1c24;
-        --bge-error-background: #fdecec;
-    }
+:root {
+    --bge-navy: #003b5c;
+    --bge-text: #454545;
+    --bge-muted: #666666;
+    --bge-border: #dddddd;
+    --bge-teal: #00b7a5;
+    --bge-error: #9d1c24;
+    --bge-error-bg: #fdecec;
+}
 
-    #custom-chat-launcher,
-    #chat-launcher-ring,
-    #chat-choice-panel,
-    #chat-loading-panel,
-    #custom-chat-launcher *,
-    #chat-choice-panel *,
-    #chat-loading-panel * {
-        box-sizing: border-box;
-        font-family: Arial, Helvetica, sans-serif;
-    }
+/* Persistent decorative gradient ring */
+#chat-launcher-ring {
+    position: fixed;
+    right: 14px;
+    bottom: 14px;
+    z-index: 999990;
+    display: none;
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: linear-gradient(
+        135deg,
+        #0075bd 0%,
+        #006bb4 28%,
+        #4e4aa3 52%,
+        #893e98 72%,
+        #d5007f 100%
+    );
+    box-shadow: 0 5px 15px rgba(0, 59, 92, 0.22);
+    pointer-events: none;
+}
 
-    /*
-     * THICK PRODUCTION-STYLE GRADIENT RING
-     *
-     * Outer ring: 84 × 84
-     * Inner custom launcher: 64 × 64
-     *
-     * Visible ring thickness:
-     * (84 - 64) / 2 = 10px
-     */
+/* Initial custom launcher */
+#custom-chat-launcher {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 999998;
+    display: none;
+    width: 64px;
+    height: 64px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 2px 7px rgba(0, 59, 92, 0.18);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#custom-chat-launcher:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 59, 92, 0.24);
+}
+
+#custom-chat-launcher img {
+    display: block;
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+}
+
+/* Selector and loading panels */
+#chat-choice-panel,
+#chat-loading-panel {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 999999;
+    display: none;
+    box-sizing: border-box;
+    width: min(390px, calc(100vw - 32px));
+    padding: 8px 16px 18px;
+    border: 1px solid #eeeeee;
+    border-radius: 20px 20px 0 0;
+    background: #ffffff;
+    color: var(--bge-text);
+    font-family: Arial, Helvetica, sans-serif;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.16);
+}
+
+#chat-choice-panel *,
+#chat-loading-panel * {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#chat-choice-panel.is-open,
+#chat-loading-panel.is-open {
+    display: block;
+}
+
+.chat-top-handle {
+    width: 40px;
+    height: 4px;
+    margin: 0 auto 12px;
+    border-radius: 50px;
+    background: #b9b9b5;
+}
+
+/* Selector header */
+#chat-choice-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 13px;
+}
+
+#chat-heading-content {
+    min-width: 0;
+    flex: 1;
+}
+
+#chat-heading-content h2 {
+    margin: 0 0 5px;
+    color: var(--bge-navy);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+#chat-heading-content p {
+    margin: 0;
+    color: var(--bge-muted);
+    font-size: 15px;
+    line-height: 1.35;
+}
+
+#chat-choice-close {
+    display: flex;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 50%;
+    background: #f4f4f4;
+    color: var(--bge-navy);
+    cursor: pointer;
+}
+
+#chat-choice-close:hover {
+    background: #eaeaea;
+}
+
+#chat-choice-close svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+
+#chat-divider {
+    height: 1px;
+    margin: 0 -16px 13px;
+    background: #e3e3e3;
+}
+
+/* Bot options */
+#chat-options {
+    display: grid;
+    gap: 12px;
+}
+
+.chat-option {
+    display: flex;
+    width: 100%;
+    min-height: 110px;
+    padding: 17px 16px 17px 12px;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid var(--bge-border);
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--bge-text);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chat-option:hover:not(:disabled) {
+    border-color: #b9b9b9;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.07);
+}
+
+.chat-option:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.chat-option-icon-shell,
+#loading-icon-shell {
+    display: flex;
+    width: 50px;
+    height: 50px;
+    flex: 0 0 50px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(
+        135deg,
+        #0075bd 0%,
+        #006bb4 28%,
+        #4e4aa3 52%,
+        #893e98 72%,
+        #d5007f 100%
+    );
+}
+
+.chat-option-icon-inner,
+#loading-icon-inner {
+    display: flex;
+    width: 38px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #ffffff;
+    color: var(--bge-navy);
+}
+
+.chat-option-icon-inner svg,
+#loading-icon-inner svg {
+    width: 22px;
+    height: 22px;
+}
+
+.chat-option-copy {
+    min-width: 0;
+    flex: 1;
+}
+
+.chat-option-copy strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--bge-navy);
+    font-size: 15.5px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.chat-option-copy span {
+    display: block;
+    color: #555555;
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+.chat-option-chevron {
+    display: flex;
+    width: 26px;
+    height: 26px;
+    flex: 0 0 26px;
+    align-items: center;
+    justify-content: center;
+    color: #666666;
+}
+
+.chat-option-chevron svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+#chat-choice-footnote {
+    margin: 13px 0 0 48px;
+    color: #606060;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+/* Loading panel */
+#loading-header {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #e3e3e3;
+}
+
+#loading-title-copy h2 {
+    margin: 0 0 4px;
+    color: var(--bge-navy);
+    font-size: 18px;
+    line-height: 1.25;
+}
+
+#loading-title-copy p {
+    margin: 0;
+    color: var(--bge-muted);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+#loading-body {
+    padding-top: 18px;
+}
+
+#loading-message {
+    margin: 0;
+    color: var(--bge-text);
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+#loading-progress {
+    position: relative;
+    overflow: hidden;
+    height: 5px;
+    margin-top: 18px;
+    border-radius: 20px;
+    background: #e8e8e8;
+}
+
+#loading-progress::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -45%;
+    width: 45%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #0075bd, #683f9c, #d5007f);
+    content: "";
+    animation: loading-slide 1.15s ease-in-out infinite;
+}
+
+@keyframes loading-slide {
+    from { left: -45%; }
+    to { left: 100%; }
+}
+
+#chat-error-message {
+    display: none;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: var(--bge-error-bg);
+    color: var(--bge-error);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+#chat-error-message.visible {
+    display: block;
+}
+
+#back-to-options {
+    display: none;
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px 16px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--bge-navy);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#back-to-options.visible {
+    display: block;
+}
+
+#custom-chat-launcher:focus-visible,
+#chat-choice-close:focus-visible,
+.chat-option:focus-visible,
+#back-to-options:focus-visible {
+    outline: 3px solid var(--bge-teal);
+    outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
     #chat-launcher-ring {
-        position: fixed;
-        right: 14px;
-        bottom: 14px;
-        z-index: 999990;
-
-        display: block;
-
-        width: 84px;
-        height: 84px;
-
-        border-radius: 50%;
-
-        background:
-            linear-gradient(
-                135deg,
-                #0075bd 0%,
-                #006bb4 28%,
-                #4e4aa3 52%,
-                #893e98 72%,
-                #d5007f 100%
-            );
-
-        box-shadow:
-            0 5px 15px rgba(0, 59, 92, 0.22);
-
-        pointer-events: none;
+        right: 9px;
+        bottom: 9px;
     }
 
-    /*
-     * INITIAL GENERIC LAUNCHER
-     *
-     * The button is centred inside the 84px ring:
-     *
-     * Ring position: 14px
-     * Button position: 24px
-     * Difference: 10px
-     */
     #custom-chat-launcher {
-        position: fixed;
-        right: 24px;
-        bottom: 24px;
-        z-index: 999998;
-
-        display: flex;
-
-        width: 64px;
-        height: 64px;
-
-        padding: 0;
-
-        align-items: center;
-        justify-content: center;
-
-        border: 0;
-        border-radius: 50%;
-
-        background: #ffffff;
-
-        cursor: pointer;
-
-        box-shadow:
-            0 2px 7px rgba(0, 59, 92, 0.18);
-
-        transition:
-            transform 0.15s ease,
-            box-shadow 0.15s ease;
+        right: 19px;
+        bottom: 19px;
     }
 
-    #custom-chat-launcher:hover {
-        transform: translateY(-1px);
-
-        box-shadow:
-            0 4px 12px rgba(0, 59, 92, 0.24);
-    }
-
-    /*
-     * The source image is 48 × 48.
-     * Render at 38 × 38 to preserve white space.
-     */
-    #custom-chat-launcher img {
-        display: block;
-
-        width: 38px;
-        height: 38px;
-
-        object-fit: contain;
-    }
-
-    /*
-     * CHAT CHOICE PANEL
-     */
-    #chat-choice-panel {
-        position: fixed;
-        right: 24px;
-        bottom: 24px;
-        z-index: 999999;
-
-        display: none;
-
-        width: min(
-            390px,
-            calc(100vw - 32px)
-        );
-
-        padding: 8px 16px 18px;
-
-        border: 1px solid #eeeeee;
-        border-radius: 20px 20px 0 0;
-
-        background: var(--bge-panel);
-        color: var(--bge-text);
-
-        box-shadow:
-            0 8px 30px rgba(0, 0, 0, 0.16);
-    }
-
-    #chat-choice-panel.is-open {
-        display: block;
-    }
-
-    /*
-     * LOADING PANEL
-     */
+    #chat-choice-panel,
     #chat-loading-panel {
-        position: fixed;
-        right: 24px;
-        bottom: 24px;
-        z-index: 999999;
-
-        display: none;
-
-        width: min(
-            390px,
-            calc(100vw - 32px)
-        );
-
-        padding: 8px 16px 20px;
-
-        border: 1px solid #eeeeee;
-        border-radius: 20px 20px 0 0;
-
-        background: #ffffff;
-        color: var(--bge-text);
-
-        box-shadow:
-            0 8px 30px rgba(0, 0, 0, 0.16);
-    }
-
-    #chat-loading-panel.is-open {
-        display: block;
-    }
-
-    .chat-top-handle {
-        width: 40px;
-        height: 4px;
-
-        margin: 0 auto 12px;
-
-        border-radius: 50px;
-
-        background: #b9b9b5;
-    }
-
-    /*
-     * SELECTOR HEADER
-     */
-    #chat-choice-header {
-        display: flex;
-
-        align-items: flex-start;
-        justify-content: space-between;
-
-        gap: 16px;
-
-        margin-bottom: 13px;
-    }
-
-    #chat-heading-content {
-        min-width: 0;
-        flex: 1;
-    }
-
-    #chat-heading-content h2 {
-        margin: 0 0 5px;
-
-        color: var(--bge-navy);
-
-        font-size: 20px;
-        font-weight: 700;
-        line-height: 1.2;
-    }
-
-    #chat-heading-content p {
-        margin: 0;
-
-        color: var(--bge-muted);
-
-        font-size: 15px;
-        line-height: 1.35;
-    }
-
-    #chat-choice-close {
-        display: flex;
-
-        width: 44px;
-        height: 44px;
-
-        flex: 0 0 44px;
-
-        padding: 0;
-
-        align-items: center;
-        justify-content: center;
-
-        border: 0;
-        border-radius: 50%;
-
-        background: var(--bge-close);
-        color: var(--bge-navy);
-
-        cursor: pointer;
-
-        transition:
-            background 0.15s ease,
-            transform 0.15s ease;
-    }
-
-    #chat-choice-close:hover {
-        background: #eaeaea;
-        transform: scale(1.03);
-    }
-
-    #chat-choice-close svg {
-        width: 22px;
-        height: 22px;
-
-        fill: none;
-
-        stroke: currentColor;
-        stroke-width: 2;
-        stroke-linecap: round;
-    }
-
-    #chat-divider {
-        height: 1px;
-
-        margin: 0 -16px 13px;
-
-        background: #e3e3e3;
-    }
-
-    /*
-     * OPTIONS
-     */
-    #chat-options {
-        display: grid;
-        gap: 12px;
-    }
-
-    .chat-option {
-        display: flex;
-
-        width: 100%;
-        min-height: 110px;
-
-        padding: 17px 16px 17px 12px;
-
-        align-items: center;
-
-        gap: 14px;
-
-        border: 1px solid var(--bge-border);
-        border-radius: 12px;
-
-        background: #ffffff;
-        color: var(--bge-text);
-
-        text-align: left;
-
-        cursor: pointer;
-
-        transition:
-            border-color 0.15s ease,
-            box-shadow 0.15s ease,
-            transform 0.1s ease;
-    }
-
-    .chat-option:hover:not(:disabled) {
-        border-color: #b9b9b9;
-
-        box-shadow:
-            0 3px 8px rgba(0, 0, 0, 0.07);
-    }
-
-    .chat-option:active {
-        transform: scale(0.995);
-    }
-
-    .chat-option:disabled {
-        cursor: wait;
-        opacity: 0.65;
-    }
-
-    /*
-     * OPTION ICONS
-     */
-    .chat-option-icon-shell {
-        display: flex;
-
-        width: 50px;
-        height: 50px;
-
-        flex: 0 0 50px;
-
-        align-items: center;
-        justify-content: center;
-
-        border-radius: 50%;
-
-        background:
-            linear-gradient(
-                135deg,
-                #0075bd 0%,
-                #006bb4 28%,
-                #4e4aa3 52%,
-                #893e98 72%,
-                #d5007f 100%
-            );
-    }
-
-    .chat-option-icon-inner {
-        display: flex;
-
-        width: 38px;
-        height: 38px;
-
-        align-items: center;
-        justify-content: center;
-
-        border-radius: 50%;
-
-        background: #ffffff;
-        color: var(--bge-navy);
-    }
-
-    .chat-option-icon-inner svg {
-        width: 22px;
-        height: 22px;
-    }
-
-    .chat-option-copy {
-        min-width: 0;
-        flex: 1;
-    }
-
-    .chat-option-copy strong {
-        display: block;
-
-        margin-bottom: 4px;
-
-        color: var(--bge-navy);
-
-        font-size: 15.5px;
-        font-weight: 700;
-        line-height: 1.25;
-    }
-
-    .chat-option-copy span {
-        display: block;
-
-        color: #555555;
-
-        font-size: 15px;
-        line-height: 1.4;
-    }
-
-    .chat-option-chevron {
-        display: flex;
-
-        width: 26px;
-        height: 26px;
-
-        flex: 0 0 26px;
-
-        align-items: center;
-        justify-content: center;
-
-        color: #666666;
-    }
-
-    .chat-option-chevron svg {
-        width: 17px;
-        height: 17px;
-
-        fill: none;
-
-        stroke: currentColor;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
-
-    #chat-choice-footnote {
-        margin: 13px 0 0 48px;
-
-        color: #606060;
-
-        font-size: 12px;
-        line-height: 1.35;
-    }
-
-    /*
-     * LOADING CONTENT
-     */
-    #loading-header {
-        display: flex;
-
-        align-items: center;
-
-        gap: 13px;
-
-        padding-bottom: 14px;
-
-        border-bottom: 1px solid #e3e3e3;
-    }
-
-    #loading-icon-shell {
-        display: flex;
-
-        width: 50px;
-        height: 50px;
-
-        flex: 0 0 50px;
-
-        align-items: center;
-        justify-content: center;
-
-        border-radius: 50%;
-
-        background:
-            linear-gradient(
-                135deg,
-                #0075bd 0%,
-                #006bb4 28%,
-                #4e4aa3 52%,
-                #893e98 72%,
-                #d5007f 100%
-            );
-    }
-
-    #loading-icon-inner {
-        display: flex;
-
-        width: 38px;
-        height: 38px;
-
-        align-items: center;
-        justify-content: center;
-
-        border-radius: 50%;
-
-        background: #ffffff;
-        color: var(--bge-navy);
-    }
-
-    #loading-icon-inner svg {
-        width: 22px;
-        height: 22px;
-    }
-
-    #loading-title-copy h2 {
-        margin: 0 0 4px;
-
-        color: var(--bge-navy);
-
-        font-size: 18px;
-        font-weight: 700;
-        line-height: 1.25;
-    }
-
-    #loading-title-copy p {
-        margin: 0;
-
-        color: var(--bge-muted);
-
-        font-size: 13px;
-        line-height: 1.35;
-    }
-
-    #loading-body {
-        padding-top: 18px;
-    }
-
-    #loading-message {
-        margin: 0;
-
-        color: var(--bge-text);
-
-        font-size: 15px;
-        line-height: 1.5;
-    }
-
-    #loading-progress {
-        position: relative;
-
-        overflow: hidden;
-
-        height: 5px;
-
-        margin-top: 18px;
-
-        border-radius: 20px;
-
-        background: #e8e8e8;
-    }
-
-    #loading-progress::after {
-        position: absolute;
-        top: 0;
+        right: 0;
         bottom: 0;
-        left: -45%;
-
-        width: 45%;
-
-        border-radius: 20px;
-
-        background:
-            linear-gradient(
-                90deg,
-                #0075bd,
-                #683f9c,
-                #d5007f
-            );
-
-        content: "";
-
-        animation:
-            loading-slide
-            1.15s
-            ease-in-out
-            infinite;
+        width: 100vw;
+        border-right: 0;
+        border-bottom: 0;
+        border-left: 0;
+        border-radius: 20px 20px 0 0;
     }
-
-    @keyframes loading-slide {
-        from {
-            left: -45%;
-        }
-
-        to {
-            left: 100%;
-        }
-    }
-
-    /*
-     * ERROR
-     */
-    #chat-error-message {
-        display: none;
-
-        margin-top: 16px;
-        padding: 12px 14px;
-
-        border-radius: 8px;
-
-        background: var(--bge-error-background);
-        color: var(--bge-error);
-
-        font-size: 13px;
-        line-height: 1.45;
-    }
-
-    #chat-error-message.visible {
-        display: block;
-    }
-
-    #back-to-options {
-        display: none;
-
-        width: 100%;
-
-        margin-top: 14px;
-        padding: 12px 16px;
-
-        border: 0;
-        border-radius: 8px;
-
-        background: var(--bge-navy);
-        color: #ffffff;
-
-        font-size: 14px;
-        font-weight: 700;
-
-        cursor: pointer;
-    }
-
-    #back-to-options.visible {
-        display: block;
-    }
-
-    #custom-chat-launcher:focus-visible,
-    #chat-choice-close:focus-visible,
-    .chat-option:focus-visible,
-    #back-to-options:focus-visible {
-        outline: 3px solid var(--bge-teal);
-        outline-offset: 3px;
-    }
-
-    /*
-     * MOBILE POSITIONING
-     */
-    @media (max-width: 600px) {
-        #chat-launcher-ring {
-            right: 9px;
-            bottom: 9px;
-        }
-
-        #custom-chat-launcher {
-            right: 19px;
-            bottom: 19px;
-        }
-
-        #chat-choice-panel,
-        #chat-loading-panel {
-            right: 0;
-            bottom: 0;
-
-            width: 100vw;
-
-            border-right: 0;
-            border-bottom: 0;
-            border-left: 0;
-
-            border-radius: 20px 20px 0 0;
-        }
-    }
+}
 </style>
 
+<!-- Frontend gradient ring -->
+<div id="chat-launcher-ring" aria-hidden="true"></div>
 
-<!--
-    PERSISTENT FRONTEND GRADIENT RING
-
-    The ring is intentionally larger than both:
-    - the custom initial launcher
-    - the native minimized Salesforce launcher
--->
-<div
-    id="chat-launcher-ring"
-    aria-hidden="true"
-></div>
-
-
-<!-- INITIAL CUSTOM LAUNCHER -->
-
+<!-- Initial custom launcher -->
 <button
     id="custom-chat-launcher"
     type="button"
@@ -707,32 +430,19 @@ title: Chat with us
     >
 </button>
 
-
-<!-- CHOICE PANEL -->
-
+<!-- Bot selector -->
 <section
     id="chat-choice-panel"
     role="dialog"
     aria-modal="false"
     aria-labelledby="chat-choice-title"
 >
-    <div
-        class="chat-top-handle"
-        aria-hidden="true"
-    ></div>
+    <div class="chat-top-handle" aria-hidden="true"></div>
 
     <div id="chat-choice-header">
-
         <div id="chat-heading-content">
-
-            <h2 id="chat-choice-title">
-                Chat with us
-            </h2>
-
-            <p>
-                Choose what you need help with
-            </p>
-
+            <h2 id="chat-choice-title">Chat with us</h2>
+            <p>Choose what you need help with</p>
         </div>
 
         <button
@@ -741,21 +451,14 @@ title: Chat with us
             aria-label="Close chat options"
             title="Close"
         >
-            <svg
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-            >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M7 7l10 10"></path>
                 <path d="M17 7L7 17"></path>
             </svg>
         </button>
-
     </div>
 
-    <div
-        id="chat-divider"
-        aria-hidden="true"
-    ></div>
+    <div id="chat-divider" aria-hidden="true"></div>
 
     <div id="chat-options">
 
@@ -764,10 +467,7 @@ title: Chat with us
             type="button"
             data-bot="agentforce"
         >
-            <span
-                class="chat-option-icon-shell"
-                aria-hidden="true"
-            >
+            <span class="chat-option-icon-shell" aria-hidden="true">
                 <span class="chat-option-icon-inner">
                     <svg viewBox="0 0 24 24">
                         <path
@@ -779,10 +479,7 @@ title: Chat with us
             </span>
 
             <span class="chat-option-copy">
-                <strong>
-                    Explore plans &amp; switch
-                </strong>
-
+                <strong>Explore plans &amp; switch</strong>
                 <span>
                     New or existing customer?<br>
                     Compare plans, renew or check<br>
@@ -790,31 +487,21 @@ title: Chat with us
                 </span>
             </span>
 
-            <span
-                class="chat-option-chevron"
-                aria-hidden="true"
-            >
+            <span class="chat-option-chevron" aria-hidden="true">
                 <svg viewBox="0 0 24 24">
                     <path d="M9 6l6 6-6 6"></path>
                 </svg>
             </span>
         </button>
 
-
         <button
             class="chat-option"
             type="button"
             data-bot="einstein"
         >
-            <span
-                class="chat-option-icon-shell"
-                aria-hidden="true"
-            >
+            <span class="chat-option-icon-shell" aria-hidden="true">
                 <span class="chat-option-icon-inner">
-                    <svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                    >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
                         <g
                             fill="none"
                             stroke="currentColor"
@@ -822,35 +509,13 @@ title: Chat with us
                             stroke-linecap="round"
                             stroke-linejoin="round"
                         >
-                            <rect
-                                x="5"
-                                y="7"
-                                width="14"
-                                height="11"
-                                rx="2"
-                            ></rect>
-
+                            <rect x="5" y="7" width="14" height="11" rx="2"></rect>
                             <path d="M12 4v3"></path>
                             <path d="M10 4h4"></path>
                             <path d="M8 18v2"></path>
                             <path d="M16 18v2"></path>
-
-                            <circle
-                                cx="9.5"
-                                cy="11.5"
-                                r="1"
-                                fill="currentColor"
-                                stroke="none"
-                            ></circle>
-
-                            <circle
-                                cx="14.5"
-                                cy="11.5"
-                                r="1"
-                                fill="currentColor"
-                                stroke="none"
-                            ></circle>
-
+                            <circle cx="9.5" cy="11.5" r="1" fill="currentColor" stroke="none"></circle>
+                            <circle cx="14.5" cy="11.5" r="1" fill="currentColor" stroke="none"></circle>
                             <path d="M9 15h6"></path>
                         </g>
                     </svg>
@@ -858,20 +523,14 @@ title: Chat with us
             </span>
 
             <span class="chat-option-copy">
-                <strong>
-                    Help with my account
-                </strong>
-
+                <strong>Help with my account</strong>
                 <span>
                     Bills, payments, meter reads and<br>
                     more
                 </span>
             </span>
 
-            <span
-                class="chat-option-chevron"
-                aria-hidden="true"
-            >
+            <span class="chat-option-chevron" aria-hidden="true">
                 <svg viewBox="0 0 24 24">
                     <path d="M9 6l6 6-6 6"></path>
                 </svg>
@@ -885,30 +544,15 @@ title: Chat with us
     </p>
 </section>
 
-
-<!-- LOADING PANEL -->
-
-<section
-    id="chat-loading-panel"
-    aria-labelledby="loading-title"
->
-    <div
-        class="chat-top-handle"
-        aria-hidden="true"
-    ></div>
+<!-- Loading panel -->
+<section id="chat-loading-panel" aria-labelledby="loading-title">
+    <div class="chat-top-handle" aria-hidden="true"></div>
 
     <div id="loading-header">
-
-        <div
-            id="loading-icon-shell"
-            aria-hidden="true"
-        >
+        <div id="loading-icon-shell" aria-hidden="true">
             <div id="loading-icon-inner">
 
-                <svg
-                    id="loading-agentforce-icon"
-                    viewBox="0 0 24 24"
-                >
+                <svg id="loading-agentforce-icon" viewBox="0 0 24 24">
                     <path
                         d="M13.1 2L6.6 12.2H11L9.9 22L17.4 10.4H13L13.1 2Z"
                         fill="currentColor"
@@ -918,7 +562,7 @@ title: Chat with us
                 <svg
                     id="loading-einstein-icon"
                     viewBox="0 0 24 24"
-                    style="display: none;"
+                    style="display:none"
                 >
                     <g
                         fill="none"
@@ -927,35 +571,13 @@ title: Chat with us
                         stroke-linecap="round"
                         stroke-linejoin="round"
                     >
-                        <rect
-                            x="5"
-                            y="7"
-                            width="14"
-                            height="11"
-                            rx="2"
-                        ></rect>
-
+                        <rect x="5" y="7" width="14" height="11" rx="2"></rect>
                         <path d="M12 4v3"></path>
                         <path d="M10 4h4"></path>
                         <path d="M8 18v2"></path>
                         <path d="M16 18v2"></path>
-
-                        <circle
-                            cx="9.5"
-                            cy="11.5"
-                            r="1"
-                            fill="currentColor"
-                            stroke="none"
-                        ></circle>
-
-                        <circle
-                            cx="14.5"
-                            cy="11.5"
-                            r="1"
-                            fill="currentColor"
-                            stroke="none"
-                        ></circle>
-
+                        <circle cx="9.5" cy="11.5" r="1" fill="currentColor" stroke="none"></circle>
+                        <circle cx="14.5" cy="11.5" r="1" fill="currentColor" stroke="none"></circle>
                         <path d="M9 15h6"></path>
                     </g>
                 </svg>
@@ -964,29 +586,17 @@ title: Chat with us
         </div>
 
         <div id="loading-title-copy">
-
-            <h2 id="loading-title">
-                Opening chat
-            </h2>
-
-            <p id="loading-subtitle">
-                Connecting to your assistant
-            </p>
-
+            <h2 id="loading-title">Opening chat</h2>
+            <p id="loading-subtitle">Connecting to your assistant</p>
         </div>
-
     </div>
 
     <div id="loading-body">
-
         <p id="loading-message">
             Please wait while the conversation opens.
         </p>
 
-        <div
-            id="loading-progress"
-            aria-hidden="true"
-        ></div>
+        <div id="loading-progress" aria-hidden="true"></div>
 
         <div
             id="chat-error-message"
@@ -994,159 +604,98 @@ title: Chat with us
             aria-live="assertive"
         ></div>
 
-        <button
-            id="back-to-options"
-            type="button"
-        >
+        <button id="back-to-options" type="button">
             Back to chat options
         </button>
-
     </div>
 </section>
-
 
 <script type="text/javascript">
 (function () {
     "use strict";
 
-    var ORG_ID =
-        "00DRR00000V4G17";
+    var ORG_ID = "00DRR00000V4G17";
 
     var SCRT2_URL =
         "https://bordgaisenergyeandu--afdev2.sandbox.my.salesforce-scrt.com";
 
     var BOT_CONFIG = {
         agentforce: {
-            name:
-                "Agentforce",
-
-            title:
-                "Explore plans & switch",
-
-            subtitle:
-                "Connecting to Agentforce",
-
-            deploymentName:
-                "MIAWPOC_Github",
-
+            name: "Agentforce",
+            title: "Explore plans & switch",
+            subtitle: "Connecting to Agentforce",
+            deploymentName: "MIAWPOC_Github",
             siteURL:
                 "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1793617406174",
-
             bootstrapURL:
                 "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1793617406174/assets/js/bootstrap.min.js"
         },
 
         einstein: {
-            name:
-                "Einstein",
-
-            title:
-                "Help with my account",
-
-            subtitle:
-                "Connecting to Virtual Assistant",
-
-            deploymentName:
-                "MIAWPOC_GithubEinstein",
-
+            name: "Einstein",
+            title: "Help with my account",
+            subtitle: "Connecting to Virtual Assistant",
+            deploymentName: "MIAWPOC_GithubEinstein",
             siteURL:
                 "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1794841236383",
-
             bootstrapURL:
                 "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1794841236383/assets/js/bootstrap.min.js"
         }
     };
 
     var launcherRing =
-        document.getElementById(
-            "chat-launcher-ring"
-        );
+        document.getElementById("chat-launcher-ring");
 
     var launcher =
-        document.getElementById(
-            "custom-chat-launcher"
-        );
+        document.getElementById("custom-chat-launcher");
 
     var choicePanel =
-        document.getElementById(
-            "chat-choice-panel"
-        );
+        document.getElementById("chat-choice-panel");
 
     var choiceClose =
-        document.getElementById(
-            "chat-choice-close"
-        );
+        document.getElementById("chat-choice-close");
 
     var chatOptions =
-        document.querySelectorAll(
-            ".chat-option"
-        );
+        document.querySelectorAll(".chat-option");
 
     var loadingPanel =
-        document.getElementById(
-            "chat-loading-panel"
-        );
+        document.getElementById("chat-loading-panel");
 
     var loadingTitle =
-        document.getElementById(
-            "loading-title"
-        );
+        document.getElementById("loading-title");
 
     var loadingSubtitle =
-        document.getElementById(
-            "loading-subtitle"
-        );
+        document.getElementById("loading-subtitle");
 
     var loadingMessage =
-        document.getElementById(
-            "loading-message"
-        );
+        document.getElementById("loading-message");
 
     var loadingProgress =
-        document.getElementById(
-            "loading-progress"
-        );
+        document.getElementById("loading-progress");
 
     var agentforceLoadingIcon =
-        document.getElementById(
-            "loading-agentforce-icon"
-        );
+        document.getElementById("loading-agentforce-icon");
 
     var einsteinLoadingIcon =
-        document.getElementById(
-            "loading-einstein-icon"
-        );
+        document.getElementById("loading-einstein-icon");
 
     var errorMessage =
-        document.getElementById(
-            "chat-error-message"
-        );
+        document.getElementById("chat-error-message");
 
     var backButton =
-        document.getElementById(
-            "back-to-options"
-        );
+        document.getElementById("back-to-options");
 
-    var selectedBot =
-        null;
-
-    var buttonCreated =
-        false;
-
-    var launchRequested =
-        false;
-
-    var launchStarted =
-        false;
-
-    var initializationTimer =
-        null;
+    var selectedBot = null;
+    var buttonCreated = false;
+    var launchRequested = false;
+    var launchStarted = false;
+    var initializationTimer = null;
+    var launcherObserver = null;
+    var ringSyncTimer = null;
 
     function getSelectedBotFromURL() {
         var parameters =
-            new URLSearchParams(
-                window.location.search
-            );
+            new URLSearchParams(window.location.search);
 
         var botKey =
             parameters.get("bot");
@@ -1166,15 +715,10 @@ title: Chat with us
 
     function getBotURL(botKey) {
         var url =
-            new URL(
-                window.location.href
-            );
+            new URL(window.location.href);
 
-        url.search =
-            "";
-
-        url.hash =
-            "";
+        url.search = "";
+        url.hash = "";
 
         url.searchParams.set(
             "bot",
@@ -1192,6 +736,139 @@ title: Chat with us
     function hideLauncherRing() {
         launcherRing.style.display =
             "none";
+    }
+
+    /*
+     * Find Salesforce's native minimized launcher.
+     */
+    function getNativeSalesforceButton() {
+        return (
+            document.querySelector(
+                "#embeddedMessagingConversationButton"
+            ) ||
+            document.querySelector(
+                ".embeddedMessagingConversationButton"
+            ) ||
+            document.querySelector(
+                "button[class*='embeddedMessagingConversationButton']"
+            )
+        );
+    }
+
+    /*
+     * Return true only when Salesforce's native minimized
+     * launcher is actually visible.
+     */
+    function isNativeSalesforceButtonVisible() {
+        var nativeButton =
+            getNativeSalesforceButton();
+
+        if (!nativeButton) {
+            return false;
+        }
+
+        var style =
+            window.getComputedStyle(
+                nativeButton
+            );
+
+        var rect =
+            nativeButton.getBoundingClientRect();
+
+        return (
+            style.display !== "none" &&
+            style.visibility !== "hidden" &&
+            parseFloat(
+                style.opacity || "1"
+            ) > 0 &&
+            rect.width > 0 &&
+            rect.height > 0
+        );
+    }
+
+    /*
+     * Ring visibility rules:
+     *
+     * Initial page:
+     * ring visible behind custom launcher.
+     *
+     * Salesforce maximized:
+     * ring hidden.
+     *
+     * Salesforce minimized:
+     * ring visible behind native launcher.
+     */
+    function syncLauncherRing() {
+        if (!selectedBot) {
+            if (
+                launcher.style.display !== "none" &&
+                !choicePanel.classList.contains("is-open") &&
+                !loadingPanel.classList.contains("is-open")
+            ) {
+                showLauncherRing();
+            } else {
+                hideLauncherRing();
+            }
+
+            return;
+        }
+
+        if (
+            isNativeSalesforceButtonVisible()
+        ) {
+            showLauncherRing();
+        } else {
+            hideLauncherRing();
+        }
+    }
+
+    function scheduleRingSync() {
+        if (ringSyncTimer) {
+            window.clearTimeout(
+                ringSyncTimer
+            );
+        }
+
+        ringSyncTimer =
+            window.setTimeout(
+                syncLauncherRing,
+                20
+            );
+    }
+
+    function startLauncherObserver() {
+        if (launcherObserver) {
+            return;
+        }
+
+        launcherObserver =
+            new MutationObserver(
+                function () {
+                    scheduleRingSync();
+                }
+            );
+
+        launcherObserver.observe(
+            document.body,
+            {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: [
+                    "class",
+                    "style",
+                    "hidden",
+                    "aria-hidden"
+                ]
+            }
+        );
+
+        window.addEventListener(
+            "resize",
+            scheduleRingSync
+        );
+
+        scheduleRingSync();
     }
 
     function openChoicePanel() {
@@ -1224,7 +901,7 @@ title: Chat with us
         launcher.style.display =
             "flex";
 
-        showLauncherRing();
+        scheduleRingSync();
 
         launcher.focus();
     }
@@ -1298,6 +975,21 @@ title: Chat with us
         loadingPanel.classList.remove(
             "is-open"
         );
+
+        scheduleRingSync();
+    }
+
+    function clearInitializationTimer() {
+        if (!initializationTimer) {
+            return;
+        }
+
+        window.clearTimeout(
+            initializationTimer
+        );
+
+        initializationTimer =
+            null;
     }
 
     function showError(message) {
@@ -1323,19 +1015,6 @@ title: Chat with us
         backButton.classList.add(
             "visible"
         );
-    }
-
-    function clearInitializationTimer() {
-        if (!initializationTimer) {
-            return;
-        }
-
-        window.clearTimeout(
-            initializationTimer
-        );
-
-        initializationTimer =
-            null;
     }
 
     function selectBot(botKey) {
@@ -1376,9 +1055,7 @@ title: Chat with us
             !selectedBot ||
             !buttonCreated
         ) {
-            launchRequested =
-                true;
-
+            launchRequested = true;
             return;
         }
 
@@ -1399,13 +1076,11 @@ title: Chat with us
             return;
         }
 
-        launchRequested =
-            false;
-
-        launchStarted =
-            true;
+        launchRequested = false;
+        launchStarted = true;
 
         hideNativeSalesforceLauncher();
+        hideLauncherRing();
 
         embeddedservice_bootstrap.utilAPI
             .launchChat()
@@ -1418,14 +1093,16 @@ title: Chat with us
                     "none";
 
                 /*
-                 * The thick ring remains behind the native
-                 * Salesforce launcher before and after minimize.
+                 * The conversation opens maximized.
+                 * Keep the ring hidden until the native
+                 * minimized launcher becomes visible.
                  */
-                showLauncherRing();
+                hideLauncherRing();
+
+                scheduleRingSync();
             })
             .catch(function (error) {
-                launchStarted =
-                    false;
+                launchStarted = false;
 
                 hideLauncherRing();
 
@@ -1460,12 +1137,13 @@ title: Chat with us
         window.addEventListener(
             "onEmbeddedMessagingButtonCreated",
             function () {
-                buttonCreated =
-                    true;
+                buttonCreated = true;
 
                 clearInitializationTimer();
 
                 hideNativeSalesforceLauncher();
+
+                scheduleRingSync();
 
                 if (launchRequested) {
                     launchSelectedChat();
@@ -1486,7 +1164,14 @@ title: Chat with us
                 launcher.style.display =
                     "none";
 
-                showLauncherRing();
+                /*
+                 * Fix for the screenshot:
+                 * do not show a separate gradient ball while
+                 * the chat window is maximized.
+                 */
+                hideLauncherRing();
+
+                scheduleRingSync();
             }
         );
 
@@ -1511,8 +1196,8 @@ title: Chat with us
                 "en_US";
 
             /*
-             * Align the Salesforce launcher centre with the
-             * centre of the 84 × 84 frontend ring.
+             * Salesforce format is:
+             * bottom offset, right offset.
              */
             embeddedservice_bootstrap.settings
                 .chatButtonPosition =
@@ -1532,8 +1217,7 @@ title: Chat with us
                 }
             );
         } catch (error) {
-            launchRequested =
-                false;
+            launchRequested = false;
 
             hideLauncherRing();
 
@@ -1557,8 +1241,7 @@ title: Chat with us
         var config =
             BOT_CONFIG[selectedBot];
 
-        launchRequested =
-            true;
+        launchRequested = true;
 
         showLoadingPanel(
             selectedBot
@@ -1587,8 +1270,7 @@ title: Chat with us
 
         bootstrapScript.onerror =
             function () {
-                launchRequested =
-                    false;
+                launchRequested = false;
 
                 hideLauncherRing();
 
@@ -1606,8 +1288,7 @@ title: Chat with us
             window.setTimeout(
                 function () {
                     if (!buttonCreated) {
-                        launchRequested =
-                            false;
+                        launchRequested = false;
 
                         hideLauncherRing();
 
@@ -1623,16 +1304,12 @@ title: Chat with us
 
     launcher.addEventListener(
         "click",
-        function () {
-            openChoicePanel();
-        }
+        openChoicePanel
     );
 
     choiceClose.addEventListener(
         "click",
-        function () {
-            closeChoicePanel();
-        }
+        closeChoicePanel
     );
 
     Array.prototype.forEach.call(
@@ -1641,9 +1318,7 @@ title: Chat with us
             option.addEventListener(
                 "click",
                 function () {
-                    disableOptions(
-                        true
-                    );
+                    disableOptions(true);
 
                     selectBot(
                         option.getAttribute(
@@ -1684,14 +1359,9 @@ title: Chat with us
                 "link"
             );
 
-        link.rel =
-            "preconnect";
-
-        link.href =
-            url;
-
-        link.crossOrigin =
-            "anonymous";
+        link.rel = "preconnect";
+        link.href = url;
+        link.crossOrigin = "anonymous";
 
         document.head.appendChild(
             link
@@ -1705,6 +1375,8 @@ title: Chat with us
     addPreconnect(
         "https://bordgaisenergyeandu--afdev2.sandbox.my.salesforce-scrt.com"
     );
+
+    startLauncherObserver();
 
     selectedBot =
         getSelectedBotFromURL();
@@ -1720,7 +1392,7 @@ title: Chat with us
         launcher.style.display =
             "flex";
 
-        showLauncherRing();
+        scheduleRingSync();
     }
 })();
 </script>
