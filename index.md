@@ -73,8 +73,8 @@ title: Chat with us
 
     #custom-chat-launcher img {
         display: block;
-        width: 47px;
-        height: 47px;
+        width: 38px;
+        height: 38px;
         object-fit: contain;
     }
 
