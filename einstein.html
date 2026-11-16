@@ -1,1 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
 
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Help with my account</title>
+
+    <style>
+        :root {
+            --bge-navy: #003b5c;
+            --bge-teal: #00b7a5;
+            --bge-purple: #89449b;
+            --bge-text: #454545;
+            --bge-muted: #666666;
+            --bge-error: #9d1c24;
+            --bge-error-background: #fdecec;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        /*
+         * Displayed only while Einstein is starting.
+         */
+        #chat-loading-panel {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 999990;
+
+            width: min(
+                390px,
+                calc(100vw - 32px)
+            );
+
+            padding:
+                8px
+                16px
+                20px;
+
+            border: 1px solid #eeeeee;
+            border-radius: 20px 20px 0 0;
+
+            background: #ffffff;
+
+            box-shadow:
+                0 8px 30px rgba(0, 0, 0, 0.16);
+        }
+
+        #loading-handle {
+            width: 40px;
+            height: 4px;
+
+            margin:
+                0 auto
+                12px;
+
+            border-radius: 50px;
+
+            background: #b9b9b5;
+        }
+
+        #loading-header {
+            display: flex;
+
+            align-items: center;
+
+            gap: 13px;
+
+            padding-bottom: 14px;
+
+            border-bottom: 1px solid #e3e3e3;
+        }
+
+        #loading-icon-shell {
+            display: flex;
+
+            width: 46px;
+            height: 46px;
+
+            flex: 0 0 46px;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 9px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--bge-teal) 0%,
+                    var(--bge-teal) 46%,
+                    var(--bge-purple) 54%,
+                    var(--bge-purple) 100%
+                );
+        }
+
+        #loading-icon-inner {
+            display: flex;
+
+            width: 40px;
+            height: 40px;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 7px;
+
+            background: #ffffff;
+
+            color: var(--bge-navy);
+        }
+
+        #loading-icon-inner svg {
+            width: 23px;
+            height: 23px;
+        }
+
+        #loading-title-copy {
+            min-width: 0;
+        }
+
+        #loading-title-copy h1 {
+            margin: 0 0 4px;
+
+            color: var(--bge-navy);
+
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.25;
+        }
+
+        #loading-title-copy p {
+            margin: 0;
+
+            color: var(--bge-muted);
+
+            font-size: 13px;
+            line-height: 1.35;
+        }
+
+        #loading-body {
+            padding-top: 18px;
+        }
+
+        #loading-message {
+            margin: 0;
+
+            color: var(--bge-text);
+
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        #loading-progress {
+            position: relative;
+
+            overflow: hidden;
+
+            height: 4px;
+
+            margin-top: 18px;
+
+            border-radius: 20px;
+
+            background: #e8e8e8;
+        }
+
+        #loading-progress::after {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -45%;
+
+            width: 45%;
+
+            border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    var(--bge-teal),
+                    var(--bge-purple)
+                );
+
+            content: "";
+
+            animation:
+                loading-slide
+                1.15s
+                ease-in-out
+                infinite;
+        }
+
+        @keyframes loading-slide {
+            from {
+                left: -45%;
+            }
+
+            to {
+                left: 100%;
+            }
+        }
+
+        #chat-error-panel {
+            display: none;
+
+            margin-top: 16px;
+            padding: 12px 14px;
+
+            border-radius: 8px;
+
+            background: var(--bge-error-background);
+            color: var(--bge-error);
+
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        #chat-error-panel.visible {
+            display: block;
+        }
+
+        #back-to-options {
+            display: none;
+
+            width: 100%;
+
+            margin-top: 14px;
+            padding: 12px 16px;
+
+            border: 0;
+            border-radius: 8px;
+
+            background: var(--bge-navy);
+            color: #ffffff;
+
+            font-size: 14px;
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        #back-to-options.visible {
+            display: block;
+        }
+
+        #back-to-options:hover {
+            background: #002d47;
+        }
+
+        #back-to-options:focus-visible {
+            outline: 3px solid var(--bge-teal);
+            outline-offset: 3px;
+        }
+
+        @media (max-width: 600px) {
+            #chat-loading-panel {
+                right: 0;
+                bottom: 0;
+
+                width: 100vw;
+
+                border-right: 0;
+                border-bottom: 0;
+                border-left: 0;
+
+                border-radius:
+                    20px
+                    20px
+                    0
+                    0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <section
+        id="chat-loading-panel"
+        aria-labelledby="loading-title"
+    >
+        <div
+            id="loading-handle"
+            aria-hidden="true"
+        ></div>
+
+        <div id="loading-header">
+
+            <div
+                id="loading-icon-shell"
+                aria-hidden="true"
+            >
+
+                <div id="loading-icon-inner">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <g
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <rect
+                                x="5"
+                                y="7"
+                                width="14"
+                                height="11"
+                                rx="2"
+                            ></rect>
+
+                            <path
+                                d="M12 4v3"
+                            ></path>
+
+                            <path
+                                d="M10 4h4"
+                            ></path>
+
+                            <path
+                                d="M8 18v2"
+                            ></path>
+
+                            <path
+                                d="M16 18v2"
+                            ></path>
+
+                            <circle
+                                cx="9.5"
+                                cy="11.5"
+                                r="1"
+                                fill="currentColor"
+                                stroke="none"
+                            ></circle>
+
+                            <circle
+                                cx="14.5"
+                                cy="11.5"
+                                r="1"
+                                fill="currentColor"
+                                stroke="none"
+                            ></circle>
+
+                            <path
+                                d="M9 15h6"
+                            ></path>
+                        </g>
+                    </svg>
+
+                </div>
+
+            </div>
+
+            <div id="loading-title-copy">
+
+                <h1 id="loading-title">
+                    Help with my account
+                </h1>
+
+                <p>
+                    Connecting to Virtual Assistant
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div id="loading-body">
+
+            <p id="loading-message">
+                Please wait while the conversation opens.
+            </p>
+
+            <div
+                id="loading-progress"
+                aria-hidden="true"
+            ></div>
+
+            <div
+                id="chat-error-panel"
+                role="alert"
+                aria-live="assertive"
+            ></div>
+
+            <button
+                id="back-to-options"
+                type="button"
+            >
+                Back to chat options
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <script type="text/javascript">
+        (function () {
+
+            "use strict";
+
+
+            /*
+             * EINSTEIN ESD CONFIGURATION
+             *
+             * This page contains ONLY the new
+             * MIAWPOC_GithubEinstein deployment.
+             */
+
+            var ORG_ID =
+                "00DRR00000V4G17";
+
+
+            var DEPLOYMENT_NAME =
+                "MIAWPOC_GithubEinstein";
+
+
+            var SITE_URL =
+                "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1794841236383";
+
+
+            var BOOTSTRAP_URL =
+                "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1794841236383/assets/js/bootstrap.min.js";
+
+
+            var SCRT2_URL =
+                "https://bordgaisenergyeandu--afdev2.sandbox.my.salesforce-scrt.com";
+
+
+            /*
+             * DOM
+             */
+
+            var loadingPanel =
+                document.getElementById(
+                    "chat-loading-panel"
+                );
+
+
+            var loadingMessage =
+                document.getElementById(
+                    "loading-message"
+                );
+
+
+            var loadingProgress =
+                document.getElementById(
+                    "loading-progress"
+                );
+
+
+            var errorPanel =
+                document.getElementById(
+                    "chat-error-panel"
+                );
+
+
+            var backButton =
+                document.getElementById(
+                    "back-to-options"
+                );
+
+
+            /*
+             * STATE
+             */
+
+            var buttonCreated =
+                false;
+
+
+            var launchStarted =
+                false;
+
+
+            var launchCompleted =
+                false;
+
+
+            var initializationTimer =
+                null;
+
+
+            /*
+             * RETURN TO INDEX
+             */
+
+            function goBackToOptions() {
+
+                window.location.href =
+                    "index.md";
+            }
+
+
+            /*
+             * TIMER
+             */
+
+            function clearInitializationTimer() {
+
+                if (!initializationTimer) {
+                    return;
+                }
+
+
+                window.clearTimeout(
+                    initializationTimer
+                );
+
+
+                initializationTimer =
+                    null;
+            }
+
+
+            /*
+             * LOADING UI
+             */
+
+            function hideLoadingPanel() {
+
+                loadingPanel.style.display =
+                    "none";
+            }
+
+
+            function showLoadingPanel() {
+
+                loadingPanel.style.display =
+                    "block";
+            }
+
+
+            /*
+             * ERROR UI
+             */
+
+            function showError(message) {
+
+                clearInitializationTimer();
+
+
+                showLoadingPanel();
+
+
+                loadingMessage.textContent =
+                    "We could not open the chat.";
+
+
+                loadingProgress.style.display =
+                    "none";
+
+
+                errorPanel.textContent =
+                    message;
+
+
+                errorPanel.classList.add(
+                    "visible"
+                );
+
+
+                backButton.classList.add(
+                    "visible"
+                );
+            }
+
+
+            /*
+             * HIDE SALESFORCE'S OWN LAUNCHER
+             *
+             * Do this only after
+             * onEmbeddedMessagingButtonCreated.
+             */
+
+            function hideNativeSalesforceLauncher() {
+
+                if (!buttonCreated) {
+                    return;
+                }
+
+
+                try {
+
+                    if (
+                        window.embeddedservice_bootstrap &&
+                        embeddedservice_bootstrap.utilAPI &&
+                        typeof embeddedservice_bootstrap.utilAPI
+                            .hideChatButton === "function"
+                    ) {
+
+                        embeddedservice_bootstrap.utilAPI
+                            .hideChatButton();
+                    }
+
+                } catch (error) {
+
+                    console.warn(
+                        "Unable to hide the Salesforce launcher.",
+                        error
+                    );
+                }
+            }
+
+
+            /*
+             * LAUNCH EINSTEIN
+             */
+
+            function launchEinstein() {
+
+                if (
+                    launchStarted ||
+                    !buttonCreated
+                ) {
+                    return;
+                }
+
+
+                if (
+                    !window.embeddedservice_bootstrap ||
+                    !embeddedservice_bootstrap.utilAPI ||
+                    typeof embeddedservice_bootstrap.utilAPI
+                        .launchChat !== "function"
+                ) {
+
+                    showError(
+                        "Salesforce loaded, but the Launch Chat API is unavailable."
+                    );
+
+
+                    return;
+                }
+
+
+                launchStarted =
+                    true;
+
+
+                hideNativeSalesforceLauncher();
+
+
+                embeddedservice_bootstrap.utilAPI
+                    .launchChat()
+                    .then(function () {
+
+                        launchCompleted =
+                            true;
+
+
+                        clearInitializationTimer();
+
+
+                        hideLoadingPanel();
+
+                    })
+                    .catch(function (error) {
+
+                        launchStarted =
+                            false;
+
+
+                        showError(
+                            error && error.message
+                                ? error.message
+             
