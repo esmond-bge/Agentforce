@@ -30,7 +30,7 @@ title: Chat with us
     }
 
     /*
-     * GENERIC CHAT LAUNCHER
+     * MAIN CHAT LAUNCHER
      */
     #custom-chat-launcher {
         position: fixed;
@@ -39,41 +39,43 @@ title: Chat with us
         z-index: 999998;
 
         display: flex;
-        width: 62px;
-        height: 62px;
-
+        width: 64px;
+        height: 64px;
         padding: 0;
 
         align-items: center;
         justify-content: center;
 
-        border: 0;
+        border: 2px solid var(--bge-navy);
         border-radius: 50%;
 
-        background: var(--bge-navy);
-        color: #ffffff;
+        background: #ffffff;
 
         cursor: pointer;
 
         box-shadow:
-            0 5px 15px rgba(0, 0, 0, 0.18);
+            0 4px 14px rgba(0, 59, 92, 0.18);
 
         transition:
             transform 0.15s ease,
-            box-shadow 0.15s ease;
+            box-shadow 0.15s ease,
+            border-color 0.15s ease;
     }
 
     #custom-chat-launcher:hover {
         transform: translateY(-2px);
 
+        border-color: #002d47;
+
         box-shadow:
-            0 7px 18px rgba(0, 0, 0, 0.22);
+            0 6px 18px rgba(0, 59, 92, 0.25);
     }
 
-    #custom-chat-launcher svg {
-        width: 29px;
-        height: 29px;
-        fill: currentColor;
+    #custom-chat-launcher img {
+        display: block;
+        width: 47px;
+        height: 47px;
+        object-fit: contain;
     }
 
     /*
@@ -674,14 +676,11 @@ title: Chat with us
     aria-label="Chat with us"
     title="Chat with us"
 >
-    <svg
-        viewBox="0 0 24 24"
+    <img
+        src="https://assets-us-01.kc-usercontent.com/7dd6b71d-d672-0004-6a4d-7043e1d0db33/f10c1d13-bb82-4b7d-a52a-eb42c94d0f35/MessagesSquare%201.png"
+        alt=""
         aria-hidden="true"
     >
-        <path
-            d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H8l-5 4v-4.5A2 2 0 0 1 2 16V6a2 2 0 0 1 2-2Zm2.5 6a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm5.5 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm5.5 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"
-        ></path>
-    </svg>
 </button>
 
 
@@ -1327,15 +1326,6 @@ title: Chat with us
             return;
         }
 
-        /*
-         * The URL reload is intentional.
-         *
-         * Each selected deployment receives a completely
-         * clean top-level embeddedservice_bootstrap runtime.
-         *
-         * This prevents Agentforce from being reused when
-         * Einstein is selected, or vice versa.
-         */
         window.location.assign(
             getBotURL(botKey)
         );
@@ -1381,9 +1371,7 @@ title: Chat with us
             return;
         }
 
-        if (
-            launchStarted
-        ) {
+        if (launchStarted) {
             return;
         }
 
@@ -1415,10 +1403,6 @@ title: Chat with us
 
                 hideLoadingPanel();
 
-                /*
-                 * The custom launcher remains hidden while
-                 * the native Salesforce window is active.
-                 */
                 launcher.style.display =
                     "none";
             })
@@ -1501,15 +1485,6 @@ title: Chat with us
             function () {
                 clearInitializationTimer();
 
-                /*
-                 * A conversation has ended.
-                 *
-                 * Reload the same physical page without the
-                 * bot parameter.
-                 *
-                 * This unloads the active Salesforce ESD and
-                 * brings the visitor back to the chooser.
-                 */
                 window.location.replace(
                     getCleanURL()
                 );
@@ -1750,22 +1725,11 @@ title: Chat with us
         getSelectedBotFromURL();
 
     if (selectedBot) {
-        /*
-         * A specific ESD was selected.
-         *
-         * Hide the generic launcher and initialize
-         * only that deployment.
-         */
         launcher.style.display =
             "none";
 
         loadSelectedDeployment();
     } else {
-        /*
-         * No active ESD.
-         *
-         * Display the generic launcher.
-         */
         launcher.style.display =
             "flex";
     }
