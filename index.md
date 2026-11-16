@@ -12,16 +12,19 @@ title: Chat with us
         --bge-muted: #666666;
         --bge-border: #dddddd;
         --bge-panel: #ffffff;
-        --bge-page: #ffffff;
         --bge-close: #f4f4f4;
         --bge-teal: #00b7a5;
         --bge-purple: #89449b;
+        --bge-error: #9d1c24;
+        --bge-error-background: #fdecec;
     }
 
     #custom-chat-launcher,
     #chat-choice-panel,
+    #chat-loading-panel,
     #custom-chat-launcher *,
-    #chat-choice-panel * {
+    #chat-choice-panel *,
+    #chat-loading-panel * {
         box-sizing: border-box;
         font-family: Arial, Helvetica, sans-serif;
     }
@@ -110,9 +113,45 @@ title: Chat with us
     }
 
     /*
-     * SMALL HANDLE AT TOP
+     * LOADING WINDOW
      */
-    #chat-drag-handle {
+    #chat-loading-panel {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 999999;
+
+        display: none;
+
+        width: min(
+            390px,
+            calc(100vw - 32px)
+        );
+
+        padding:
+            8px
+            16px
+            20px;
+
+        border: 1px solid #eeeeee;
+        border-radius: 20px 20px 0 0;
+
+        background: #ffffff;
+
+        color: var(--bge-text);
+
+        box-shadow:
+            0 8px 30px rgba(0, 0, 0, 0.16);
+    }
+
+    #chat-loading-panel.is-open {
+        display: block;
+    }
+
+    /*
+     * TOP HANDLE
+     */
+    .chat-top-handle {
         width: 40px;
         height: 4px;
 
@@ -126,7 +165,7 @@ title: Chat with us
     }
 
     /*
-     * HEADER
+     * SELECTOR HEADER
      */
     #chat-choice-header {
         display: flex;
@@ -232,8 +271,6 @@ title: Chat with us
     }
 
     .chat-option {
-        position: relative;
-
         display: flex;
 
         width: 100%;
@@ -266,7 +303,7 @@ title: Chat with us
             transform 0.1s ease;
     }
 
-    .chat-option:hover {
+    .chat-option:hover:not(:disabled) {
         border-color: #b9b9b9;
 
         box-shadow:
@@ -283,11 +320,9 @@ title: Chat with us
     }
 
     /*
-     * ICON WRAPPER WITH COLOURED BORDER
+     * OPTION ICONS
      */
     .chat-option-icon-shell {
-        position: relative;
-
         display: flex;
 
         width: 46px;
@@ -332,7 +367,7 @@ title: Chat with us
     }
 
     /*
-     * TEXT
+     * OPTION TEXT
      */
     .chat-option-copy {
         min-width: 0;
@@ -361,9 +396,6 @@ title: Chat with us
         line-height: 1.4;
     }
 
-    /*
-     * RIGHT CHEVRON
-     */
     .chat-option-chevron {
         display: flex;
 
@@ -403,43 +435,204 @@ title: Chat with us
         color: #606060;
 
         font-size: 12px;
-        font-weight: 400;
         line-height: 1.35;
     }
 
     /*
-     * NAVIGATION STATUS
+     * LOADING CONTENT
      */
-    #chat-navigation-status {
-        display: none;
+    #loading-header {
+        display: flex;
 
-        margin-top: 12px;
-        padding: 10px 12px;
+        align-items: center;
 
-        border-radius: 8px;
+        gap: 13px;
 
-        background: #f2f7f8;
+        padding-bottom: 14px;
+
+        border-bottom: 1px solid #e3e3e3;
+    }
+
+    #loading-icon-shell {
+        display: flex;
+
+        width: 46px;
+        height: 46px;
+
+        flex: 0 0 46px;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 9px;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--bge-teal) 0%,
+                var(--bge-teal) 46%,
+                var(--bge-purple) 54%,
+                var(--bge-purple) 100%
+            );
+    }
+
+    #loading-icon-inner {
+        display: flex;
+
+        width: 40px;
+        height: 40px;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 7px;
+
+        background: #ffffff;
 
         color: var(--bge-navy);
+    }
+
+    #loading-icon-inner svg {
+        width: 23px;
+        height: 23px;
+    }
+
+    #loading-title-copy h2 {
+        margin: 0 0 4px;
+
+        color: var(--bge-navy);
+
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.25;
+    }
+
+    #loading-title-copy p {
+        margin: 0;
+
+        color: var(--bge-muted);
 
         font-size: 13px;
         line-height: 1.35;
     }
 
-    #chat-navigation-status.visible {
+    #loading-body {
+        padding-top: 18px;
+    }
+
+    #loading-message {
+        margin: 0;
+
+        color: var(--bge-text);
+
+        font-size: 15px;
+        line-height: 1.5;
+    }
+
+    #loading-progress {
+        position: relative;
+
+        overflow: hidden;
+
+        height: 4px;
+
+        margin-top: 18px;
+
+        border-radius: 20px;
+
+        background: #e8e8e8;
+    }
+
+    #loading-progress::after {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -45%;
+
+        width: 45%;
+
+        border-radius: 20px;
+
+        background:
+            linear-gradient(
+                90deg,
+                var(--bge-teal),
+                var(--bge-purple)
+            );
+
+        content: "";
+
+        animation:
+            loading-slide
+            1.15s
+            ease-in-out
+            infinite;
+    }
+
+    @keyframes loading-slide {
+        from {
+            left: -45%;
+        }
+
+        to {
+            left: 100%;
+        }
+    }
+
+    /*
+     * ERROR
+     */
+    #chat-error-message {
+        display: none;
+
+        margin-top: 16px;
+        padding: 12px 14px;
+
+        border-radius: 8px;
+
+        background: var(--bge-error-background);
+        color: var(--bge-error);
+
+        font-size: 13px;
+        line-height: 1.45;
+    }
+
+    #chat-error-message.visible {
+        display: block;
+    }
+
+    #back-to-options {
+        display: none;
+
+        width: 100%;
+
+        margin-top: 14px;
+        padding: 12px 16px;
+
+        border: 0;
+        border-radius: 8px;
+
+        background: var(--bge-navy);
+        color: #ffffff;
+
+        font-size: 14px;
+        font-weight: 700;
+
+        cursor: pointer;
+    }
+
+    #back-to-options.visible {
         display: block;
     }
 
     /*
-     * FOCUS
+     * ACCESSIBILITY
      */
     #custom-chat-launcher:focus-visible,
     #chat-choice-close:focus-visible,
-    .chat-option:focus-visible {
-        outline:
-            3px solid
-            #00a99d;
-
+    .chat-option:focus-visible,
+    #back-to-options:focus-visible {
+        outline: 3px solid var(--bge-teal);
         outline-offset: 3px;
     }
 
@@ -447,13 +640,13 @@ title: Chat with us
      * MOBILE
      */
     @media (max-width: 600px) {
-
         #custom-chat-launcher {
             right: 18px;
             bottom: 18px;
         }
 
-        #chat-choice-panel {
+        #chat-choice-panel,
+        #chat-loading-panel {
             right: 0;
             bottom: 0;
 
@@ -492,7 +685,7 @@ title: Chat with us
 </button>
 
 
-<!-- BOT SELECTOR -->
+<!-- CHAT CHOICE PANEL -->
 
 <section
     id="chat-choice-panel"
@@ -500,12 +693,10 @@ title: Chat with us
     aria-modal="false"
     aria-labelledby="chat-choice-title"
 >
-
     <div
-        id="chat-drag-handle"
+        class="chat-top-handle"
         aria-hidden="true"
     ></div>
-
 
     <div id="chat-choice-header">
 
@@ -521,14 +712,12 @@ title: Chat with us
 
         </div>
 
-
         <button
             id="chat-choice-close"
             type="button"
             aria-label="Close chat options"
             title="Close"
         >
-
             <svg
                 viewBox="0 0 24 24"
                 aria-hidden="true"
@@ -536,57 +725,39 @@ title: Chat with us
                 <path d="M7 7l10 10"></path>
                 <path d="M17 7L7 17"></path>
             </svg>
-
         </button>
 
     </div>
-
 
     <div
         id="chat-divider"
         aria-hidden="true"
     ></div>
 
-
     <div id="chat-options">
-
 
         <!-- AGENTFORCE -->
 
         <button
-            id="agentforce-option"
             class="chat-option"
             type="button"
-            data-page="agentforce.html"
-            data-name="Explore plans & switch"
+            data-bot="agentforce"
         >
-
             <span
                 class="chat-option-icon-shell"
                 aria-hidden="true"
             >
-
-                <span
-                    class="chat-option-icon-inner"
-                >
-
-                    <svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                    >
+                <span class="chat-option-icon-inner">
+                    <svg viewBox="0 0 24 24">
                         <path
                             d="M13.1 2L6.6 12.2H11L9.9 22L17.4 10.4H13L13.1 2Z"
                             fill="currentColor"
                         ></path>
                     </svg>
-
                 </span>
-
             </span>
 
-
             <span class="chat-option-copy">
-
                 <strong>
                     Explore plans &amp; switch
                 </strong>
@@ -596,43 +767,31 @@ title: Chat with us
                     Compare plans, renew or check<br>
                     your contract
                 </span>
-
             </span>
-
 
             <span
                 class="chat-option-chevron"
                 aria-hidden="true"
             >
-
                 <svg viewBox="0 0 24 24">
                     <path d="M9 6l6 6-6 6"></path>
                 </svg>
-
             </span>
-
         </button>
 
 
         <!-- EINSTEIN -->
 
         <button
-            id="einstein-option"
             class="chat-option"
             type="button"
-            data-page="einstein.html"
-            data-name="Help with my account"
+            data-bot="einstein"
         >
-
             <span
                 class="chat-option-icon-shell"
                 aria-hidden="true"
             >
-
-                <span
-                    class="chat-option-icon-inner"
-                >
-
+                <span class="chat-option-icon-inner">
                     <svg
                         viewBox="0 0 24 24"
                         aria-hidden="true"
@@ -652,21 +811,10 @@ title: Chat with us
                                 rx="2"
                             ></rect>
 
-                            <path
-                                d="M12 4v3"
-                            ></path>
-
-                            <path
-                                d="M10 4h4"
-                            ></path>
-
-                            <path
-                                d="M8 18v2"
-                            ></path>
-
-                            <path
-                                d="M16 18v2"
-                            ></path>
+                            <path d="M12 4v3"></path>
+                            <path d="M10 4h4"></path>
+                            <path d="M8 18v2"></path>
+                            <path d="M16 18v2"></path>
 
                             <circle
                                 cx="9.5"
@@ -684,19 +832,13 @@ title: Chat with us
                                 stroke="none"
                             ></circle>
 
-                            <path
-                                d="M9 15h6"
-                            ></path>
+                            <path d="M9 15h6"></path>
                         </g>
                     </svg>
-
                 </span>
-
             </span>
 
-
             <span class="chat-option-copy">
-
                 <strong>
                     Help with my account
                 </strong>
@@ -705,331 +847,928 @@ title: Chat with us
                     Bills, payments, meter reads and<br>
                     more
                 </span>
-
             </span>
-
 
             <span
                 class="chat-option-chevron"
                 aria-hidden="true"
             >
-
                 <svg viewBox="0 0 24 24">
                     <path d="M9 6l6 6-6 6"></path>
                 </svg>
-
             </span>
-
         </button>
 
     </div>
 
-
-    <div
-        id="chat-navigation-status"
-        role="status"
-        aria-live="polite"
-    ></div>
-
-
     <p id="chat-choice-footnote">
         To switch later, close the chat and choose again.
     </p>
+</section>
 
+
+<!-- LOADING PANEL -->
+
+<section
+    id="chat-loading-panel"
+    aria-labelledby="loading-title"
+>
+    <div
+        class="chat-top-handle"
+        aria-hidden="true"
+    ></div>
+
+    <div id="loading-header">
+
+        <div
+            id="loading-icon-shell"
+            aria-hidden="true"
+        >
+            <div id="loading-icon-inner">
+
+                <svg
+                    id="loading-agentforce-icon"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        d="M13.1 2L6.6 12.2H11L9.9 22L17.4 10.4H13L13.1 2Z"
+                        fill="currentColor"
+                    ></path>
+                </svg>
+
+                <svg
+                    id="loading-einstein-icon"
+                    viewBox="0 0 24 24"
+                    style="display: none;"
+                >
+                    <g
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <rect
+                            x="5"
+                            y="7"
+                            width="14"
+                            height="11"
+                            rx="2"
+                        ></rect>
+
+                        <path d="M12 4v3"></path>
+                        <path d="M10 4h4"></path>
+                        <path d="M8 18v2"></path>
+                        <path d="M16 18v2"></path>
+
+                        <circle
+                            cx="9.5"
+                            cy="11.5"
+                            r="1"
+                            fill="currentColor"
+                            stroke="none"
+                        ></circle>
+
+                        <circle
+                            cx="14.5"
+                            cy="11.5"
+                            r="1"
+                            fill="currentColor"
+                            stroke="none"
+                        ></circle>
+
+                        <path d="M9 15h6"></path>
+                    </g>
+                </svg>
+
+            </div>
+        </div>
+
+        <div id="loading-title-copy">
+            <h2 id="loading-title">
+                Opening chat
+            </h2>
+
+            <p id="loading-subtitle">
+                Connecting to your assistant
+            </p>
+        </div>
+
+    </div>
+
+    <div id="loading-body">
+
+        <p id="loading-message">
+            Please wait while the conversation opens.
+        </p>
+
+        <div
+            id="loading-progress"
+            aria-hidden="true"
+        ></div>
+
+        <div
+            id="chat-error-message"
+            role="alert"
+            aria-live="assertive"
+        ></div>
+
+        <button
+            id="back-to-options"
+            type="button"
+        >
+            Back to chat options
+        </button>
+
+    </div>
 </section>
 
 
 <script type="text/javascript">
 (function () {
-
     "use strict";
 
+    /*
+     * SALESFORCE CONFIGURATION
+     */
+    var ORG_ID =
+        "00DRR00000V4G17";
 
+    var SCRT2_URL =
+        "https://bordgaisenergyeandu--afdev2.sandbox.my.salesforce-scrt.com";
+
+    var BOT_CONFIG = {
+        agentforce: {
+            name:
+                "Agentforce",
+
+            title:
+                "Explore plans & switch",
+
+            subtitle:
+                "Connecting to Agentforce",
+
+            deploymentName:
+                "MIAWPOC_Github",
+
+            siteURL:
+                "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1793617406174",
+
+            bootstrapURL:
+                "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1793617406174/assets/js/bootstrap.min.js"
+        },
+
+        einstein: {
+            name:
+                "Einstein",
+
+            title:
+                "Help with my account",
+
+            subtitle:
+                "Connecting to Virtual Assistant",
+
+            deploymentName:
+                "MIAWPOC_GithubEinstein",
+
+            siteURL:
+                "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1794841236383",
+
+            bootstrapURL:
+                "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1794841236383/assets/js/bootstrap.min.js"
+        }
+    };
+
+    /*
+     * DOM
+     */
     var launcher =
         document.getElementById(
             "custom-chat-launcher"
         );
 
-
-    var panel =
+    var choicePanel =
         document.getElementById(
             "chat-choice-panel"
         );
 
-
-    var closeButton =
+    var choiceClose =
         document.getElementById(
             "chat-choice-close"
         );
 
-
-    var status =
-        document.getElementById(
-            "chat-navigation-status"
-        );
-
-
-    var options =
+    var chatOptions =
         document.querySelectorAll(
             ".chat-option"
         );
 
+    var loadingPanel =
+        document.getElementById(
+            "chat-loading-panel"
+        );
 
-    var navigating =
+    var loadingTitle =
+        document.getElementById(
+            "loading-title"
+        );
+
+    var loadingSubtitle =
+        document.getElementById(
+            "loading-subtitle"
+        );
+
+    var loadingMessage =
+        document.getElementById(
+            "loading-message"
+        );
+
+    var loadingProgress =
+        document.getElementById(
+            "loading-progress"
+        );
+
+    var agentforceLoadingIcon =
+        document.getElementById(
+            "loading-agentforce-icon"
+        );
+
+    var einsteinLoadingIcon =
+        document.getElementById(
+            "loading-einstein-icon"
+        );
+
+    var errorMessage =
+        document.getElementById(
+            "chat-error-message"
+        );
+
+    var backButton =
+        document.getElementById(
+            "back-to-options"
+        );
+
+    /*
+     * STATE
+     */
+    var selectedBot =
+        null;
+
+    var buttonCreated =
         false;
 
+    var bootstrapLoading =
+        false;
 
-    function openPanel() {
+    var launchRequested =
+        false;
 
-        if (navigating) {
-            return;
+    var launchStarted =
+        false;
+
+    var initializationTimer =
+        null;
+
+    /*
+     * URL HELPERS
+     */
+    function getSelectedBotFromURL() {
+        var parameters =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        var botKey =
+            parameters.get("bot");
+
+        if (BOT_CONFIG[botKey]) {
+            return botKey;
         }
 
+        return null;
+    }
 
-        panel.classList.add(
+    function getCleanURL() {
+        return (
+            window.location.origin +
+            window.location.pathname +
+            window.location.hash
+        );
+    }
+
+    function getBotURL(botKey) {
+        var url =
+            new URL(
+                window.location.href
+            );
+
+        url.search = "";
+        url.hash = "";
+
+        url.searchParams.set(
+            "bot",
+            botKey
+        );
+
+        return url.toString();
+    }
+
+    /*
+     * SELECTOR UI
+     */
+    function openChoicePanel() {
+        choicePanel.classList.add(
             "is-open"
         );
 
+        loadingPanel.classList.remove(
+            "is-open"
+        );
 
         launcher.style.display =
             "none";
 
-
         window.setTimeout(
             function () {
-
-                closeButton.focus();
-
+                choiceClose.focus();
             },
             10
         );
     }
 
-
-    function closePanel() {
-
-        if (navigating) {
-            return;
-        }
-
-
-        panel.classList.remove(
+    function closeChoicePanel() {
+        choicePanel.classList.remove(
             "is-open"
         );
-
 
         launcher.style.display =
             "flex";
 
-
         launcher.focus();
     }
 
+    function disableOptions(disabled) {
+        Array.prototype.forEach.call(
+            chatOptions,
+            function (option) {
+                option.disabled =
+                    disabled;
+            }
+        );
+    }
 
-    function showNavigationStatus(name) {
+    /*
+     * LOADING UI
+     */
+    function showLoadingPanel(botKey) {
+        var config =
+            BOT_CONFIG[botKey];
 
-        status.textContent =
-            "Opening " +
-            name +
-            "...";
+        choicePanel.classList.remove(
+            "is-open"
+        );
 
+        loadingPanel.classList.add(
+            "is-open"
+        );
 
-        status.classList.add(
+        launcher.style.display =
+            "none";
+
+        loadingTitle.textContent =
+            config.title;
+
+        loadingSubtitle.textContent =
+            config.subtitle;
+
+        loadingMessage.textContent =
+            "Please wait while the conversation opens.";
+
+        loadingProgress.style.display =
+            "block";
+
+        errorMessage.classList.remove(
+            "visible"
+        );
+
+        errorMessage.textContent =
+            "";
+
+        backButton.classList.remove(
+            "visible"
+        );
+
+        if (botKey === "agentforce") {
+            agentforceLoadingIcon.style.display =
+                "block";
+
+            einsteinLoadingIcon.style.display =
+                "none";
+        } else {
+            agentforceLoadingIcon.style.display =
+                "none";
+
+            einsteinLoadingIcon.style.display =
+                "block";
+        }
+    }
+
+    function hideLoadingPanel() {
+        loadingPanel.classList.remove(
+            "is-open"
+        );
+    }
+
+    function showError(message) {
+        clearInitializationTimer();
+
+        showLoadingPanel(
+            selectedBot
+        );
+
+        loadingMessage.textContent =
+            "We could not open the chat.";
+
+        loadingProgress.style.display =
+            "none";
+
+        errorMessage.textContent =
+            message;
+
+        errorMessage.classList.add(
+            "visible"
+        );
+
+        backButton.classList.add(
             "visible"
         );
     }
 
+    /*
+     * TIMER
+     */
+    function clearInitializationTimer() {
+        if (!initializationTimer) {
+            return;
+        }
 
-    function disableOptions() {
+        window.clearTimeout(
+            initializationTimer
+        );
 
-        Array.prototype.forEach.call(
-            options,
-            function (option) {
+        initializationTimer =
+            null;
+    }
 
-                option.disabled =
+    /*
+     * START A CLEAN SELECTED ESD
+     */
+    function selectBot(botKey) {
+        if (!BOT_CONFIG[botKey]) {
+            return;
+        }
+
+        /*
+         * The URL reload is intentional.
+         *
+         * Each selected deployment receives a completely
+         * clean top-level embeddedservice_bootstrap runtime.
+         *
+         * This prevents Agentforce from being reused when
+         * Einstein is selected, or vice versa.
+         */
+        window.location.assign(
+            getBotURL(botKey)
+        );
+    }
+
+    /*
+     * HIDE NATIVE SALESFORCE LAUNCHER
+     */
+    function hideNativeSalesforceLauncher() {
+        if (!buttonCreated) {
+            return;
+        }
+
+        try {
+            if (
+                window.embeddedservice_bootstrap &&
+                embeddedservice_bootstrap.utilAPI &&
+                typeof embeddedservice_bootstrap.utilAPI
+                    .hideChatButton === "function"
+            ) {
+                embeddedservice_bootstrap.utilAPI
+                    .hideChatButton();
+            }
+        } catch (error) {
+            console.warn(
+                "Unable to hide Salesforce launcher.",
+                error
+            );
+        }
+    }
+
+    /*
+     * LAUNCH SELECTED CHAT
+     */
+    function launchSelectedChat() {
+        if (
+            !selectedBot ||
+            !buttonCreated
+        ) {
+            launchRequested =
+                true;
+
+            return;
+        }
+
+        if (
+            launchStarted
+        ) {
+            return;
+        }
+
+        if (
+            !window.embeddedservice_bootstrap ||
+            !embeddedservice_bootstrap.utilAPI ||
+            typeof embeddedservice_bootstrap.utilAPI
+                .launchChat !== "function"
+        ) {
+            showError(
+                "Salesforce loaded, but the Launch Chat API is unavailable."
+            );
+
+            return;
+        }
+
+        launchRequested =
+            false;
+
+        launchStarted =
+            true;
+
+        hideNativeSalesforceLauncher();
+
+        embeddedservice_bootstrap.utilAPI
+            .launchChat()
+            .then(function () {
+                clearInitializationTimer();
+
+                hideLoadingPanel();
+
+                /*
+                 * The custom launcher remains hidden while
+                 * the native Salesforce window is active.
+                 */
+                launcher.style.display =
+                    "none";
+            })
+            .catch(function (error) {
+                launchStarted =
+                    false;
+
+                showError(
+                    error && error.message
+                        ? error.message
+                        : BOT_CONFIG[selectedBot].name +
+                          " could not be opened."
+                );
+
+                console.error(
+                    "Launch Chat failed:",
+                    error
+                );
+            });
+    }
+
+    /*
+     * SALESFORCE EVENTS
+     */
+    function addSalesforceEventListeners() {
+        window.addEventListener(
+            "onEmbeddedMessagingReady",
+            function () {
+                console.log(
+                    BOT_CONFIG[selectedBot].name +
+                    " messaging runtime is ready."
+                );
+            },
+            {
+                once: true
+            }
+        );
+
+        window.addEventListener(
+            "onEmbeddedMessagingButtonCreated",
+            function () {
+                buttonCreated =
                     true;
 
+                bootstrapLoading =
+                    false;
+
+                clearInitializationTimer();
+
+                hideNativeSalesforceLauncher();
+
+                console.log(
+                    BOT_CONFIG[selectedBot].name +
+                    " chat button was created."
+                );
+
+                if (launchRequested) {
+                    launchSelectedChat();
+                }
+            },
+            {
+                once: true
+            }
+        );
+
+        window.addEventListener(
+            "onEmbeddedMessagingConversationOpened",
+            function () {
+                clearInitializationTimer();
+
+                hideLoadingPanel();
+
+                launcher.style.display =
+                    "none";
+            }
+        );
+
+        window.addEventListener(
+            "onEmbeddedMessagingConversationClosed",
+            function () {
+                clearInitializationTimer();
+
+                /*
+                 * A conversation has ended.
+                 *
+                 * Reload the same physical page without the
+                 * bot parameter.
+                 *
+                 * This unloads the active Salesforce ESD and
+                 * brings the visitor back to the chooser.
+                 */
+                window.location.replace(
+                    getCleanURL()
+                );
             }
         );
     }
 
+    /*
+     * INITIALIZE SELECTED DEPLOYMENT
+     */
+    function initializeSelectedDeployment() {
+        var config =
+            BOT_CONFIG[selectedBot];
 
-    function navigateToBot(button) {
+        try {
+            embeddedservice_bootstrap.settings.language =
+                "en_US";
 
-        if (navigating) {
-            return;
-        }
+            embeddedservice_bootstrap.settings
+                .hideChatButtonOnLoad =
+                    true;
 
+            embeddedservice_bootstrap.init(
+                ORG_ID,
+                config.deploymentName,
+                config.siteURL,
+                {
+                    scrt2URL:
+                        SCRT2_URL
+                }
+            );
+        } catch (error) {
+            bootstrapLoading =
+                false;
 
-        var page =
-            button.getAttribute(
-                "data-page"
+            launchRequested =
+                false;
+
+            showError(
+                error && error.message
+                    ? error.message
+                    : config.name +
+                      " failed to initialize."
             );
 
-
-        var name =
-            button.getAttribute(
-                "data-name"
+            console.error(
+                "Error initializing " +
+                config.name +
+                ":",
+                error
             );
-
-
-        if (!page) {
-            return;
         }
-
-
-        navigating =
-            true;
-
-
-        showNavigationStatus(
-            name ||
-            "chat"
-        );
-
-
-        disableOptions();
-
-
-        window.location.href =
-            page;
     }
 
+    /*
+     * LOAD SELECTED BOOTSTRAP
+     */
+    function loadSelectedDeployment() {
+        var config =
+            BOT_CONFIG[selectedBot];
 
+        bootstrapLoading =
+            true;
+
+        launchRequested =
+            true;
+
+        showLoadingPanel(
+            selectedBot
+        );
+
+        addSalesforceEventListeners();
+
+        var bootstrapScript =
+            document.createElement(
+                "script"
+            );
+
+        bootstrapScript.type =
+            "text/javascript";
+
+        bootstrapScript.src =
+            config.bootstrapURL;
+
+        bootstrapScript.async =
+            true;
+
+        bootstrapScript.onload =
+            function () {
+                initializeSelectedDeployment();
+            };
+
+        bootstrapScript.onerror =
+            function () {
+                bootstrapLoading =
+                    false;
+
+                launchRequested =
+                    false;
+
+                showError(
+                    config.name +
+                    " bootstrap file could not be loaded."
+                );
+            };
+
+        document.body.appendChild(
+            bootstrapScript
+        );
+
+        initializationTimer =
+            window.setTimeout(
+                function () {
+                    if (!buttonCreated) {
+                        bootstrapLoading =
+                            false;
+
+                        launchRequested =
+                            false;
+
+                        showError(
+                            config.name +
+                            " did not become ready. Check the ESD Allowed Domains, deployment status and browser console."
+                        );
+
+                        console.error(
+                            config.name +
+                            " initialization timed out.",
+                            {
+                                deploymentName:
+                                    config.deploymentName,
+
+                                siteURL:
+                                    config.siteURL
+                            }
+                        );
+                    }
+                },
+                25000
+            );
+    }
+
+    /*
+     * EVENTS
+     */
     launcher.addEventListener(
         "click",
         function () {
-
-            openPanel();
-
+            openChoicePanel();
         }
     );
 
-
-    closeButton.addEventListener(
+    choiceClose.addEventListener(
         "click",
         function () {
-
-            closePanel();
-
+            closeChoicePanel();
         }
     );
-
 
     Array.prototype.forEach.call(
-        options,
-        function (button) {
-
-            button.addEventListener(
+        chatOptions,
+        function (option) {
+            option.addEventListener(
                 "click",
                 function () {
-
-                    navigateToBot(
-                        button
+                    disableOptions(
+                        true
                     );
 
+                    selectBot(
+                        option.getAttribute(
+                            "data-bot"
+                        )
+                    );
                 }
             );
-
         }
     );
 
+    backButton.addEventListener(
+        "click",
+        function () {
+            window.location.replace(
+                getCleanURL()
+            );
+        }
+    );
 
     window.addEventListener(
         "keydown",
         function (event) {
-
             if (
                 event.key === "Escape" &&
-                panel.classList.contains(
+                choicePanel.classList.contains(
                     "is-open"
                 )
             ) {
-
-                closePanel();
-
+                closeChoicePanel();
             }
-
         }
     );
 
-
     /*
-     * Prefetch both destination pages.
-     *
-     * Salesforce itself is NOT initialized here.
+     * NETWORK WARM-UP
      */
-    function prefetchPage(page) {
-
+    function addPreconnect(url) {
         var link =
             document.createElement(
                 "link"
             );
-
-
-        link.rel =
-            "prefetch";
-
-
-        link.href =
-            page;
-
-
-        document.head.appendChild(
-            link
-        );
-    }
-
-
-    prefetchPage(
-        "agentforce.html"
-    );
-
-
-    prefetchPage(
-        "einstein.html"
-    );
-
-
-    /*
-     * Warm up Salesforce network connections.
-     */
-    function preconnect(url) {
-
-        var link =
-            document.createElement(
-                "link"
-            );
-
 
         link.rel =
             "preconnect";
 
-
         link.href =
             url;
 
-
         link.crossOrigin =
             "anonymous";
-
 
         document.head.appendChild(
             link
         );
     }
 
-
-    preconnect(
+    addPreconnect(
         "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com"
     );
 
-
-    preconnect(
+    addPreconnect(
         "https://bordgaisenergyeandu--afdev2.sandbox.my.salesforce-scrt.com"
     );
 
+    /*
+     * PAGE START
+     */
+    selectedBot =
+        getSelectedBotFromURL();
 
+    if (selectedBot) {
+        /*
+         * A specific ESD was selected.
+         *
+         * Hide the generic launcher and initialize
+         * only that deployment.
+         */
+        launcher.style.display =
+            "none";
+
+        loadSelectedDeployment();
+    } else {
+        /*
+         * No active ESD.
+         *
+         * Display the generic launcher.
+         */
+        launcher.style.display =
+            "flex";
+    }
 })();
 </script>
 
