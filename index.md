@@ -6,7 +6,7 @@ title: Agentforce
 <div markdown="0">
 
 <style>
-    #bot-launcher {
+    #custom-chat-launcher {
         position: fixed;
         right: 24px;
         bottom: 24px;
@@ -26,19 +26,19 @@ title: Agentforce
         transition: background 0.2s ease, transform 0.2s ease;
     }
 
-    #bot-launcher:hover {
+    #custom-chat-launcher:hover {
         background: #005637;
         transform: scale(1.05);
     }
 
-    #bot-launcher:focus-visible,
-    #bot-selector-close:focus-visible,
-    .bot-option:focus-visible {
+    #custom-chat-launcher:focus-visible,
+    #bot-selector-minimise:focus-visible,
+    .bot-choice:focus-visible {
         outline: 3px solid #ffb81c;
         outline-offset: 3px;
     }
 
-    #bot-launcher svg {
+    #custom-chat-launcher svg {
         width: 30px;
         height: 30px;
         fill: currentColor;
@@ -76,7 +76,7 @@ title: Agentforce
         color: #ffffff;
     }
 
-    #bot-selector-header-content {
+    #bot-selector-header-left {
         display: flex;
         align-items: center;
         gap: 12px;
@@ -104,15 +104,17 @@ title: Agentforce
         color: #ffffff;
         font-size: 18px;
         font-weight: 600;
+        line-height: 1.3;
     }
 
     #bot-selector-header-text p {
         margin: 3px 0 0;
         color: rgba(255, 255, 255, 0.88);
         font-size: 13px;
+        line-height: 1.3;
     }
 
-    #bot-selector-close {
+    #bot-selector-minimise {
         display: flex;
         width: 40px;
         height: 40px;
@@ -126,11 +128,11 @@ title: Agentforce
         cursor: pointer;
     }
 
-    #bot-selector-close:hover {
+    #bot-selector-minimise:hover {
         background: rgba(255, 255, 255, 0.15);
     }
 
-    #bot-selector-close svg {
+    #bot-selector-minimise svg {
         width: 22px;
         height: 22px;
         fill: currentColor;
@@ -165,12 +167,12 @@ title: Agentforce
         margin-top: 8px;
     }
 
-    .bot-options {
+    #bot-options {
         display: grid;
         gap: 12px;
     }
 
-    .bot-option {
+    .bot-choice {
         display: flex;
         box-sizing: border-box;
         width: 100%;
@@ -189,12 +191,17 @@ title: Agentforce
         transition: border-color 0.2s ease, background 0.2s ease;
     }
 
-    .bot-option:hover {
+    .bot-choice:hover:not(:disabled) {
         border-color: #006f44;
         background: #f2faf6;
     }
 
-    .bot-option-icon {
+    .bot-choice:disabled {
+        cursor: wait;
+        opacity: 0.65;
+    }
+
+    .bot-choice-icon {
         display: flex;
         width: 42px;
         height: 42px;
@@ -206,32 +213,56 @@ title: Agentforce
         color: #006f44;
     }
 
-    .bot-option-icon svg {
+    .bot-choice-icon svg {
         width: 23px;
         height: 23px;
         fill: currentColor;
     }
 
-    .bot-option-content {
+    .bot-choice-content {
         min-width: 0;
         flex: 1;
     }
 
-    .bot-option strong {
+    .bot-choice-content strong {
         display: block;
         margin-bottom: 4px;
         color: #1f2937;
         font-size: 16px;
+        line-height: 1.25;
     }
 
-    .bot-option span {
+    .bot-choice-description {
+        display: block;
         color: #646b75;
         font-size: 13px;
+        line-height: 1.35;
     }
 
-    .bot-option-arrow {
+    .bot-choice-arrow {
         color: #006f44;
-        font-size: 24px !important;
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    #selector-status {
+        display: none;
+        margin-top: 16px;
+        padding: 12px 14px;
+        border-radius: 8px;
+        background: #fff4e5;
+        color: #6b3d00;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    #selector-status.is-visible {
+        display: block;
+    }
+
+    #selector-status.is-error {
+        background: #fdecec;
+        color: #9d1c24;
     }
 
     #bot-selector-footer {
@@ -244,83 +275,8 @@ title: Agentforce
         text-align: center;
     }
 
-    #salesforce-chat-container {
-        position: fixed;
-        right: 16px;
-        bottom: 16px;
-        z-index: 1000000;
-        display: none;
-        overflow: hidden;
-        width: min(440px, calc(100vw - 32px));
-        height: min(720px, calc(100vh - 32px));
-        border-radius: 16px;
-        background: transparent;
-    }
-
-    #salesforce-chat-container.is-open {
-        display: block;
-    }
-
-    .salesforce-chat-frame {
-        display: none;
-        width: 100%;
-        height: 100%;
-        border: 0;
-        background: transparent;
-    }
-
-    .salesforce-chat-frame.is-active {
-        display: block;
-    }
-
-    #chat-loading {
-        position: absolute;
-        inset: 0;
-        z-index: 10;
-        display: flex;
-        box-sizing: border-box;
-        align-items: center;
-        justify-content: center;
-        padding: 24px;
-        background: #ffffff;
-        color: #30343b;
-        font-family: Arial, sans-serif;
-        text-align: center;
-    }
-
-    #chat-loading.is-hidden {
-        display: none;
-    }
-
-    #chat-loading-title {
-        display: block;
-        margin-bottom: 8px;
-        font-size: 17px;
-    }
-
-    #chat-loading-message {
-        color: #646b75;
-        font-size: 14px;
-    }
-
-    #chat-status {
-        position: fixed;
-        left: 16px;
-        bottom: 16px;
-        z-index: 1000002;
-        display: none;
-        max-width: 360px;
-        padding: 12px 14px;
-        border-radius: 8px;
-        background: #a9252a;
-        color: #ffffff;
-        font-family: Arial, sans-serif;
-        font-size: 14px;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-    }
-
     @media (max-width: 600px) {
-        #bot-launcher {
+        #custom-chat-launcher {
             right: 18px;
             bottom: 18px;
         }
@@ -332,22 +288,11 @@ title: Agentforce
             height: min(620px, 100dvh);
             border-radius: 16px 16px 0 0;
         }
-
-        #salesforce-chat-container {
-            right: 0;
-            bottom: 0;
-            width: 100vw;
-            height: 100dvh;
-            border-radius: 0;
-        }
     }
 </style>
 
-
-<!-- GENERIC CHAT LAUNCHER -->
-
 <button
-    id="bot-launcher"
+    id="custom-chat-launcher"
     type="button"
     aria-label="Open chat"
     title="Chat with us"
@@ -357,9 +302,6 @@ title: Agentforce
     </svg>
 </button>
 
-
-<!-- BOT SELECTOR -->
-
 <div
     id="bot-selector-window"
     role="dialog"
@@ -368,7 +310,7 @@ title: Agentforce
 >
     <div id="bot-selector-header">
 
-        <div id="bot-selector-header-content">
+        <div id="bot-selector-header-left">
 
             <div id="bot-selector-header-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -384,9 +326,9 @@ title: Agentforce
         </div>
 
         <button
-            id="bot-selector-close"
+            id="bot-selector-minimise"
             type="button"
-            aria-label="Minimise"
+            aria-label="Minimise chat selection"
             title="Minimise"
         >
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -403,48 +345,55 @@ title: Agentforce
             <p>Select the assistant you would like to chat with.</p>
         </div>
 
-        <div class="bot-options">
+        <div id="bot-options">
 
             <button
-                class="bot-option"
+                id="agentforce-option"
+                class="bot-choice"
                 type="button"
                 data-bot="agentforce"
             >
-                <span class="bot-option-icon">
+                <span class="bot-choice-icon">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M12 2a4 4 0 0 1 4 4v1h1a4 4 0 0 1 4 4v4a4 4 0 0 1-4 4h-1.55L12 22l-3.45-3H7a4 4 0 0 1-4-4v-4a4 4 0 0 1 4-4h1V6a4 4 0 0 1 4-4Zm-2 5h4V6a2 2 0 1 0-4 0v1Zm-3 2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2.3l2.7 2.35L14.7 17H17a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H7Z"></path>
                     </svg>
                 </span>
 
-                <span class="bot-option-content">
+                <span class="bot-choice-content">
                     <strong>Agentforce</strong>
-                    <span>Start the Agentforce conversation.</span>
+                    <span class="bot-choice-description">
+                        Start the Agentforce conversation.
+                    </span>
                 </span>
 
-                <span class="bot-option-arrow">›</span>
+                <span class="bot-choice-arrow" aria-hidden="true">›</span>
             </button>
 
-
             <button
-                class="bot-option"
+                id="einstein-option"
+                class="bot-choice"
                 type="button"
                 data-bot="einstein"
             >
-                <span class="bot-option-icon">
+                <span class="bot-choice-icon">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M12 2a9 9 0 0 1 9 9c0 3.04-1.51 5.73-3.82 7.36L18 22l-3.75-2A8.92 8.92 0 0 1 12 20a9 9 0 1 1 0-18Zm0 2a7 7 0 1 0 1.82 13.76l.38-.1 1.09.58-.26-1.17.5-.32A7 7 0 0 0 12 4Z"></path>
                     </svg>
                 </span>
 
-                <span class="bot-option-content">
+                <span class="bot-choice-content">
                     <strong>Einstein</strong>
-                    <span>Start the Einstein conversation.</span>
+                    <span class="bot-choice-description">
+                        Start the Einstein conversation.
+                    </span>
                 </span>
 
-                <span class="bot-option-arrow">›</span>
+                <span class="bot-choice-arrow" aria-hidden="true">›</span>
             </button>
 
         </div>
+
+        <div id="selector-status" role="status" aria-live="polite"></div>
 
     </div>
 
@@ -454,1201 +403,419 @@ title: Agentforce
 
 </div>
 
-
-<!-- SALESFORCE CHAT HOST -->
-
-<div id="salesforce-chat-container">
-
-    <div id="chat-loading">
-
-        <div>
-            <strong id="chat-loading-title">
-                Connecting...
-            </strong>
-
-            <div id="chat-loading-message">
-                Please wait while the conversation opens.
-            </div>
-        </div>
-
-    </div>
-
-    <iframe
-        id="agentforce-chat-frame"
-        class="salesforce-chat-frame"
-        title="Agentforce chat"
-        allow="microphone; camera"
-    ></iframe>
-
-    <iframe
-        id="einstein-chat-frame"
-        class="salesforce-chat-frame"
-        title="Einstein chat"
-        allow="microphone; camera"
-    ></iframe>
-
-</div>
-
-
-<div
-    id="chat-status"
-    role="alert"
-    aria-live="assertive"
-></div>
-
-
 <script type="text/javascript">
-
 (function () {
-
     "use strict";
-
-
-    /*************************************************
-     * SALESFORCE CONFIGURATION
-     *************************************************/
 
     var ORG_ID = "00DRR00000V4G17";
 
     var SCRT2_URL =
         "https://bordgaisenergyeandu--afdev2.sandbox.my.salesforce-scrt.com";
 
-
     var BOT_CONFIG = {
-
         agentforce: {
-
-            key: "agentforce",
-
             name: "Agentforce",
-
             deploymentName: "MIAWPOC_Github",
-
             siteURL:
                 "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1793617406174",
-
             bootstrapURL:
-                "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1793617406174/assets/js/bootstrap.min.js",
-
-            frameId:
-                "agentforce-chat-frame"
+                "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1793617406174/assets/js/bootstrap.min.js"
         },
 
-
         einstein: {
-
-            key: "einstein",
-
             name: "Einstein",
-
             deploymentName: "BGE_Github_Deployment",
-
             siteURL:
                 "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWBGEGithubDep1791797820412",
-
             bootstrapURL:
-                "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWBGEGithubDep1791797820412/assets/js/bootstrap.min.js",
-
-            frameId:
-                "einstein-chat-frame"
+                "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWBGEGithubDep1791797820412/assets/js/bootstrap.min.js"
         }
-
     };
 
-
-    /*************************************************
-     * DOM ELEMENTS
-     *************************************************/
-
     var launcher =
-        document.getElementById("bot-launcher");
+        document.getElementById("custom-chat-launcher");
 
     var selectorWindow =
         document.getElementById("bot-selector-window");
 
-    var selectorClose =
-        document.getElementById("bot-selector-close");
+    var selectorMinimise =
+        document.getElementById("bot-selector-minimise");
 
-    var chatContainer =
-        document.getElementById("salesforce-chat-container");
-
-    var chatLoading =
-        document.getElementById("chat-loading");
-
-    var chatLoadingTitle =
-        document.getElementById("chat-loading-title");
-
-    var chatLoadingMessage =
-        document.getElementById("chat-loading-message");
-
-    var chatStatus =
-        document.getElementById("chat-status");
+    var selectorStatus =
+        document.getElementById("selector-status");
 
     var botOptions =
-        document.querySelectorAll(".bot-option");
+        document.querySelectorAll(".bot-choice");
 
+    var selectedBot = null;
+    var bootstrapLoading = false;
+    var messagingReady = false;
+    var launchRequested = false;
+    var initializationTimer = null;
 
-    /*************************************************
-     * BOT STATE
-     *************************************************/
-
-    var botState = {
-
-        agentforce: {
-            ready: false,
-            initializing: false,
-            failed: false,
-            launchRequested: false
-        },
-
-        einstein: {
-            ready: false,
-            initializing: false,
-            failed: false,
-            launchRequested: false
+    function openSelector() {
+        if (selectedBot && messagingReady) {
+            launchSelectedChat();
+            return;
         }
 
-    };
-
-
-    var activeBot = null;
-
-    var connectionTimer = null;
-
-
-    /*************************************************
-     * GENERAL UI
-     *************************************************/
-
-    function getFrame(botKey) {
-
-        var config = BOT_CONFIG[botKey];
-
-        if (!config) {
-            return null;
-        }
-
-        return document.getElementById(
-            config.frameId
-        );
-    }
-
-
-    function showLauncher() {
-        launcher.style.display = "flex";
-    }
-
-
-    function hideLauncher() {
+        selectorWindow.classList.add("is-open");
         launcher.style.display = "none";
     }
 
-
-    function openSelector() {
-
-        chatContainer.classList.remove(
-            "is-open"
-        );
-
-        selectorWindow.classList.add(
-            "is-open"
-        );
-
-        hideLauncher();
-    }
-
-
-    function closeSelector() {
-
-        selectorWindow.classList.remove(
-            "is-open"
-        );
-
-        showLauncher();
-
+    function minimiseSelector() {
+        selectorWindow.classList.remove("is-open");
+        launcher.style.display = "flex";
         launcher.focus();
     }
 
-
-    function showChatContainer() {
-
-        selectorWindow.classList.remove(
-            "is-open"
-        );
-
-        chatContainer.classList.add(
-            "is-open"
-        );
-
-        hideLauncher();
-    }
-
-
-    function showLoading(botName) {
-
-        chatLoadingTitle.textContent =
-            "Opening " + botName;
-
-        chatLoadingMessage.textContent =
-            "Please wait while the conversation opens.";
-
-        chatLoading.classList.remove(
-            "is-hidden"
+    function disableBotOptions(disabled) {
+        Array.prototype.forEach.call(
+            botOptions,
+            function (button) {
+                button.disabled = disabled;
+            }
         );
     }
 
+    function setLoadingStatus(botName) {
+        selectorStatus.classList.remove("is-error");
+        selectorStatus.classList.add("is-visible");
+        selectorStatus.textContent =
+            "Connecting to " + botName + "...";
+    }
 
-    function hideLoading() {
+    function setErrorStatus(message) {
+        selectorStatus.classList.add("is-error");
+        selectorStatus.classList.add("is-visible");
+        selectorStatus.textContent = message;
+    }
 
-        chatLoading.classList.add(
-            "is-hidden"
-        );
+    function clearStatus() {
+        selectorStatus.classList.remove("is-visible");
+        selectorStatus.classList.remove("is-error");
+        selectorStatus.textContent = "";
+    }
 
-        if (connectionTimer) {
-
-            window.clearTimeout(
-                connectionTimer
-            );
-
-            connectionTimer = null;
+    function clearInitializationTimer() {
+        if (initializationTimer) {
+            window.clearTimeout(initializationTimer);
+            initializationTimer = null;
         }
     }
 
-
-    function showStatus(message) {
-
-        chatStatus.textContent = message;
-
-        chatStatus.style.display =
-            "block";
-
-        window.setTimeout(
-            function () {
-                chatStatus.style.display =
-                    "none";
-            },
-            10000
-        );
-    }
-
-
-    function activateFrame(botKey) {
-
-        Object.keys(BOT_CONFIG)
-            .forEach(function (key) {
-
-                var frame =
-                    getFrame(key);
-
-                if (!frame) {
-                    return;
-                }
-
-                if (key === botKey) {
-
-                    frame.classList.add(
-                        "is-active"
-                    );
-
-                } else {
-
-                    frame.classList.remove(
-                        "is-active"
-                    );
-                }
-
-            });
-    }
-
-
-    function resetVisibleChat() {
-
-        activeBot = null;
-
-        hideLoading();
-
-        chatContainer.classList.remove(
-            "is-open"
-        );
-
-        Object.keys(BOT_CONFIG)
-            .forEach(function (key) {
-
-                var frame =
-                    getFrame(key);
-
-                if (frame) {
-
-                    frame.classList.remove(
-                        "is-active"
-                    );
-                }
-
-            });
-
-        showLauncher();
-    }
-
-
-    /*************************************************
-     * FRAME COMMUNICATION
-     *************************************************/
-
-    function sendFrameCommand(
-        botKey,
-        command
-    ) {
-
-        var frame =
-            getFrame(botKey);
-
-        if (
-            !frame ||
-            !frame.contentWindow
-        ) {
+    function launchSelectedChat() {
+        if (!selectedBot) {
             return;
         }
 
-
-        frame.contentWindow.postMessage(
-            {
-                source:
-                    "bge-chat-parent",
-
-                type:
-                    command,
-
-                botKey:
-                    botKey
-            },
-            "*"
-        );
-    }
-
-
-    /*************************************************
-     * CREATE ISOLATED SALESFORCE ENVIRONMENT
-     *************************************************/
-
-    function createFrameDocument(config) {
-
-        var safeConfig =
-            JSON.stringify({
-
-                botKey:
-                    config.key,
-
-                orgId:
-                    ORG_ID,
-
-                deploymentName:
-                    config.deploymentName,
-
-                siteURL:
-                    config.siteURL,
-
-                bootstrapURL:
-                    config.bootstrapURL,
-
-                scrt2URL:
-                    SCRT2_URL
-
-            }).replace(
-                /</g,
-                "\\u003c"
-            );
-
-
-        return [
-
-            "<!DOCTYPE html>",
-
-            "<html lang=\"en\">",
-
-            "<head>",
-
-            "<meta charset=\"UTF-8\">",
-
-            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
-
-            "<style>",
-
-            "html, body {",
-
-            "width:100%;",
-            "height:100%;",
-            "margin:0;",
-            "overflow:hidden;",
-            "background:transparent;",
-
-            "}",
-
-            "</style>",
-
-            "</head>",
-
-            "<body>",
-
-
-            "<script type=\"text/javascript\">",
-
-
-            "(function(){",
-
-            "\"use strict\";",
-
-
-            "var config=" +
-                safeConfig +
-                ";",
-
-
-            "var messagingReady=false;",
-
-            "var launchPending=false;",
-
-
-            "function notifyParent(type,detail){",
-
-            "window.parent.postMessage({",
-
-            "source:\"bge-embedded-chat\",",
-
-            "type:type,",
-
-            "detail:detail||null,",
-
-            "botKey:config.botKey,",
-
-            "deploymentName:config.deploymentName",
-
-            "},\"*\");",
-
-            "}",
-
-
-            "function hideNativeLauncher(){",
-
-            "try{",
-
-            "if(window.embeddedservice_bootstrap &&",
-
-            "embeddedservice_bootstrap.utilAPI &&",
-
-            "typeof embeddedservice_bootstrap.utilAPI.hideChatButton === \"function\"){",
-
-            "embeddedservice_bootstrap.utilAPI.hideChatButton();",
-
-            "}",
-
-            "}catch(error){",
-
-            "console.warn(\"Unable to hide Salesforce launcher\",error);",
-
-            "}",
-
-            "}",
-
-
-            "function launchChat(){",
-
-            "if(!messagingReady){",
-
-            "launchPending=true;",
-
-            "return;",
-
-            "}",
-
-
-            "if(!window.embeddedservice_bootstrap ||",
-
-            "!embeddedservice_bootstrap.utilAPI ||",
-
-            "typeof embeddedservice_bootstrap.utilAPI.launchChat !== \"function\"){",
-
-            "notifyParent(\"chat-error\",\"Launch Chat API unavailable.\");",
-
-            "return;",
-
-            "}",
-
-
-            "embeddedservice_bootstrap.utilAPI.launchChat()",
-
-            ".then(function(){",
-
-            "notifyParent(\"chat-launched\");",
-
-            "})",
-
-            ".catch(function(error){",
-
-            "notifyParent(",
-
-            "\"chat-error\",",
-
-            "error && error.message ?",
-
-            "error.message :",
-
-            "\"The selected chat could not be launched.\"" ,
-
-            ");",
-
-            "});",
-
-            "}",
-
-
-            "window.addEventListener(",
-
-            "\"onEmbeddedMessagingReady\",",
-
-            "function(){",
-
-            "messagingReady=true;",
-
-            "hideNativeLauncher();",
-
-            "notifyParent(\"chat-ready\");",
-
-
-            "if(launchPending){",
-
-            "launchPending=false;",
-
-            "launchChat();",
-
-            "}",
-
-            "}",
-
-            ");",
-
-
-            "window.addEventListener(",
-
-            "\"onEmbeddedMessagingButtonCreated\",",
-
-            "function(){",
-
-            "hideNativeLauncher();",
-
-            "}",
-
-            ");",
-
-
-            "window.addEventListener(",
-
-            "\"onEmbeddedMessagingConversationOpened\",",
-
-            "function(){",
-
-            "notifyParent(\"conversation-opened\");",
-
-            "}",
-
-            ");",
-
-
-            "window.addEventListener(",
-
-            "\"onEmbeddedMessagingConversationClosed\",",
-
-            "function(){",
-
-            "hideNativeLauncher();",
-
-            "notifyParent(\"conversation-closed\");",
-
-            "}",
-
-            ");",
-
-
-            "window.addEventListener(",
-
-            "\"message\",",
-
-            "function(event){",
-
-            "if(!event.data ||",
-
-            "event.data.source !== \"bge-chat-parent\" ||",
-
-            "event.data.botKey !== config.botKey){",
-
-            "return;",
-
-            "}",
-
-
-            "if(event.data.type === \"launch-chat\"){",
-
-            "launchChat();",
-
-            "}",
-
-            "}",
-
-            ");",
-
-
-            "window.initEmbeddedMessaging=function(){",
-
-            "try{",
-
-            "embeddedservice_bootstrap.settings.language=\"en_US\";",
-
-            "embeddedservice_bootstrap.settings.hideChatButtonOnLoad=true;",
-
-
-            "embeddedservice_bootstrap.init(",
-
-            "config.orgId,",
-
-            "config.deploymentName,",
-
-            "config.siteURL,",
-
-            "{scrt2URL:config.scrt2URL}",
-
-            ");",
-
-            "}",
-
-            "catch(error){",
-
-            "notifyParent(",
-
-            "\"initialisation-error\",",
-
-            "error && error.message ?",
-
-            "error.message :",
-
-            "\"Embedded Messaging failed to initialise.\"" ,
-
-            ");",
-
-            "}",
-
-            "};",
-
-
-            "var bootstrapScript=document.createElement(\"script\");",
-
-            "bootstrapScript.type=\"text/javascript\";",
-
-            "bootstrapScript.src=config.bootstrapURL;",
-
-            "bootstrapScript.onload=window.initEmbeddedMessaging;",
-
-
-            "bootstrapScript.onerror=function(){",
-
-            "notifyParent(",
-
-            "\"initialisation-error\",",
-
-            "\"The Salesforce bootstrap file could not be loaded.\"" ,
-
-            ");",
-
-            "};",
-
-
-            "document.body.appendChild(bootstrapScript);",
-
-
-            "})();",
-
-
-            "<\/script>",
-
-            "</body>",
-
-            "</html>"
-
-        ].join("\n");
-
-    }
-
-
-    /*************************************************
-     * PRELOAD DEPLOYMENTS
-     *************************************************/
-
-    function preloadBot(botKey) {
-
-        var config =
-            BOT_CONFIG[botKey];
-
-        var state =
-            botState[botKey];
-
-        var frame =
-            getFrame(botKey);
-
-
-        if (
-            !config ||
-            !state ||
-            !frame ||
-            state.initializing ||
-            state.ready
-        ) {
+        if (!messagingReady) {
+            launchRequested = true;
             return;
         }
 
+        if (
+            !window.embeddedservice_bootstrap ||
+            !embeddedservice_bootstrap.utilAPI ||
+            typeof embeddedservice_bootstrap.utilAPI.launchChat !==
+                "function"
+        ) {
+            disableBotOptions(false);
 
-        state.initializing = true;
-
-        state.failed = false;
-
-
-        frame.srcdoc =
-            createFrameDocument(
-                config
+            setErrorStatus(
+                "Salesforce loaded, but the Launch Chat API is unavailable."
             );
+
+            return;
+        }
+
+        embeddedservice_bootstrap.utilAPI
+            .launchChat()
+            .then(function () {
+                clearInitializationTimer();
+                clearStatus();
+
+                selectorWindow.classList.remove("is-open");
+
+                /*
+                 * Keep the custom launcher available.
+                 * If Salesforce is minimized, selecting this launcher
+                 * calls launchChat again and restores the conversation.
+                 */
+                launcher.style.display = "flex";
+
+                disableBotOptions(false);
+            })
+            .catch(function (error) {
+                disableBotOptions(false);
+
+                setErrorStatus(
+                    error && error.message
+                        ? error.message
+                        : "The selected chat could not be opened."
+                );
+            });
     }
 
+    function initialiseSelectedBot(botKey) {
+        var config = BOT_CONFIG[botKey];
 
-    function preloadAllBots() {
-
-        /*
-         * Both deployments start bootstrapping
-         * immediately in separate JS environments.
-         */
-
-        preloadBot("agentforce");
-
-        preloadBot("einstein");
-    }
-
-
-    /*************************************************
-     * LAUNCH SELECTED BOT
-     *************************************************/
-
-    function launchBot(botKey) {
-
-        var config =
-            BOT_CONFIG[botKey];
-
-        var state =
-            botState[botKey];
-
-
-        if (!config || !state) {
-
-            showStatus(
+        if (!config) {
+            setErrorStatus(
                 "The selected chat deployment is not configured."
             );
 
             return;
         }
 
+        /*
+         * Enhanced Web Chat exposes one global
+         * embeddedservice_bootstrap runtime.
+         *
+         * Only the selected deployment is initialized.
+         * This avoids the global conflict and avoids placing
+         * Salesforce inside an unsupported nested iframe.
+         */
+        if (selectedBot && selectedBot !== botKey) {
+            setErrorStatus(
+                "A different assistant is already active. Refresh the page to switch assistants."
+            );
 
-        activeBot =
-            botKey;
+            return;
+        }
 
+        selectedBot = botKey;
+        launchRequested = true;
 
-        state.launchRequested =
-            true;
+        disableBotOptions(true);
+        setLoadingStatus(config.name);
 
+        if (messagingReady) {
+            launchSelectedChat();
+            return;
+        }
 
-        activateFrame(
-            botKey
+        if (bootstrapLoading) {
+            return;
+        }
+
+        bootstrapLoading = true;
+
+        window.addEventListener(
+            "onEmbeddedMessagingReady",
+            function handleMessagingReady() {
+                messagingReady = true;
+                bootstrapLoading = false;
+
+                clearInitializationTimer();
+
+                try {
+                    if (
+                        embeddedservice_bootstrap.utilAPI &&
+                        typeof embeddedservice_bootstrap.utilAPI
+                            .hideChatButton === "function"
+                    ) {
+                        embeddedservice_bootstrap.utilAPI
+                            .hideChatButton();
+                    }
+                } catch (error) {
+                    console.warn(
+                        "Unable to hide the Salesforce launcher.",
+                        error
+                    );
+                }
+
+                if (launchRequested) {
+                    launchRequested = false;
+                    launchSelectedChat();
+                }
+            },
+            { once: true }
         );
 
+        window.addEventListener(
+            "onEmbeddedMessagingButtonCreated",
+            function handleButtonCreated() {
+                try {
+                    if (
+                        embeddedservice_bootstrap.utilAPI &&
+                        typeof embeddedservice_bootstrap.utilAPI
+                            .hideChatButton === "function"
+                    ) {
+                        embeddedservice_bootstrap.utilAPI
+                            .hideChatButton();
+                    }
+                } catch (error) {
+                    console.warn(
+                        "Unable to hide the Salesforce launcher.",
+                        error
+                    );
+                }
+            }
+        );
 
-        showChatContainer();
+        window.addEventListener(
+            "onEmbeddedMessagingConversationOpened",
+            function () {
+                clearStatus();
+                selectorWindow.classList.remove("is-open");
+                launcher.style.display = "flex";
+            }
+        );
 
+        window.addEventListener(
+            "onEmbeddedMessagingConversationClosed",
+            function () {
+                clearStatus();
+                selectorWindow.classList.remove("is-open");
+                launcher.style.display = "flex";
+            }
+        );
 
-        /*
-         * If preload has completed this call
-         * happens immediately.
-         */
+        window.initSelectedEmbeddedMessaging = function () {
+            try {
+                embeddedservice_bootstrap.settings.language =
+                    "en_US";
 
-        if (state.ready) {
+                embeddedservice_bootstrap.settings
+                    .hideChatButtonOnLoad = true;
 
-            chatLoading.classList.add(
-                "is-hidden"
-            );
+                embeddedservice_bootstrap.init(
+                    ORG_ID,
+                    config.deploymentName,
+                    config.siteURL,
+                    {
+                        scrt2URL: SCRT2_URL
+                    }
+                );
+            } catch (error) {
+                bootstrapLoading = false;
+                launchRequested = false;
 
-            state.launchRequested =
-                false;
+                clearInitializationTimer();
+                disableBotOptions(false);
 
-
-            sendFrameCommand(
-                botKey,
-                "launch-chat"
-            );
-
-        } else {
-
-            showLoading(
-                config.name
-            );
-
-
-            if (state.failed) {
-
-                state.ready =
-                    false;
-
-                state.initializing =
-                    false;
-
-                state.failed =
-                    false;
-
-                preloadBot(
-                    botKey
+                setErrorStatus(
+                    error && error.message
+                        ? error.message
+                        : config.name +
+                          " failed to initialize."
                 );
 
-            } else if (
-                !state.initializing
-            ) {
-
-                preloadBot(
-                    botKey
+                console.error(
+                    "Error initializing " + config.name + ":",
+                    error
                 );
             }
+        };
 
-        }
+        var bootstrapScript =
+            document.createElement("script");
 
+        bootstrapScript.type = "text/javascript";
+        bootstrapScript.src = config.bootstrapURL;
+        bootstrapScript.async = true;
 
-        if (connectionTimer) {
+        bootstrapScript.onload = function () {
+            window.initSelectedEmbeddedMessaging();
+        };
 
-            window.clearTimeout(
-                connectionTimer
+        bootstrapScript.onerror = function () {
+            bootstrapLoading = false;
+            launchRequested = false;
+
+            clearInitializationTimer();
+            disableBotOptions(false);
+
+            setErrorStatus(
+                config.name +
+                " bootstrap file could not be loaded."
             );
-        }
+        };
 
+        document.body.appendChild(bootstrapScript);
 
-        connectionTimer =
-            window.setTimeout(
+        initializationTimer = window.setTimeout(
+            function () {
+                if (!messagingReady) {
+                    bootstrapLoading = false;
+                    launchRequested = false;
 
-                function () {
+                    disableBotOptions(false);
 
-                    if (
-                        activeBot === botKey &&
-                        !botState[botKey].ready
-                    ) {
-
-                        showStatus(
-                            config.name +
-                            " did not become ready. Check the Salesforce deployment, Allowed Domains and browser console."
-                        );
-
-
-                        resetVisibleChat();
-                    }
-
-                },
-
-                20000
-
-            );
+                    setErrorStatus(
+                        config.name +
+                        " did not become ready. Check the Salesforce deployment, Allowed Domains and browser console."
+                    );
+                }
+            },
+            20000
+        );
     }
 
+    /*
+     * Preconnect to Salesforce domains.
+     * This does not initialize either deployment, but it can reduce
+     * DNS, TLS and connection setup time after selection.
+     */
+    function addPreconnect(url) {
+        var link = document.createElement("link");
 
-    /*************************************************
-     * GENERIC LAUNCHER
-     *************************************************/
+        link.rel = "preconnect";
+        link.href = url;
+        link.crossOrigin = "anonymous";
+
+        document.head.appendChild(link);
+    }
+
+    addPreconnect(
+        "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com"
+    );
+
+    addPreconnect(
+        "https://bordgaisenergyeandu--afdev2.sandbox.my.salesforce-scrt.com"
+    );
 
     launcher.addEventListener(
         "click",
         function () {
-
-            /*
-             * Active conversation already exists.
-             * Salesforce launchChat will maximise
-             * the minimized conversation.
-             */
-
-            if (
-                activeBot &&
-                botState[activeBot] &&
-                botState[activeBot].ready
-            ) {
-
-                activateFrame(
-                    activeBot
-                );
-
-
-                showChatContainer();
-
-
-                sendFrameCommand(
-                    activeBot,
-                    "launch-chat"
-                );
-
-
-                return;
-            }
-
-
             openSelector();
         }
     );
 
-
-    /*************************************************
-     * SELECTOR EVENTS
-     *************************************************/
-
-    selectorClose.addEventListener(
+    selectorMinimise.addEventListener(
         "click",
         function () {
-            closeSelector();
+            minimiseSelector();
         }
     );
-
 
     Array.prototype.forEach.call(
         botOptions,
         function (button) {
-
             button.addEventListener(
                 "click",
                 function () {
-
-                    launchBot(
-                        button.getAttribute(
-                            "data-bot"
-                        )
+                    initialiseSelectedBot(
+                        button.getAttribute("data-bot")
                     );
-
                 }
             );
-
         }
     );
-
 
     window.addEventListener(
         "keydown",
         function (event) {
-
             if (
                 event.key === "Escape" &&
-                selectorWindow.classList.contains(
-                    "is-open"
-                )
+                selectorWindow.classList.contains("is-open")
             ) {
-
-                closeSelector();
+                minimiseSelector();
             }
-
         }
     );
-
-
-    /*************************************************
-     * SALESFORCE EVENTS
-     *************************************************/
-
-    window.addEventListener(
-        "message",
-        function (event) {
-
-            var message =
-                event.data;
-
-
-            if (
-                !message ||
-                message.source !==
-                    "bge-embedded-chat" ||
-                !message.botKey ||
-                !botState[
-                    message.botKey
-                ]
-            ) {
-
-                return;
-            }
-
-
-            var state =
-                botState[
-                    message.botKey
-                ];
-
-
-            var config =
-                BOT_CONFIG[
-                    message.botKey
-                ];
-
-
-            switch (
-                message.type
-            ) {
-
-
-                case "chat-ready":
-
-                    state.ready =
-                        true;
-
-                    state.initializing =
-                        false;
-
-                    state.failed =
-                        false;
-
-
-                    console.log(
-                        config.name +
-                        " preloaded and ready."
-                    );
-
-
-                    if (
-                        state.launchRequested
-                    ) {
-
-                        state.launchRequested =
-                            false;
-
-
-                        sendFrameCommand(
-                            message.botKey,
-                            "launch-chat"
-                        );
-                    }
-
-                    break;
-
-
-                case "chat-launched":
-
-                    if (
-                        activeBot ===
-                        message.botKey
-                    ) {
-
-                        hideLoading();
-                    }
-
-                    break;
-
-
-                case "conversation-opened":
-
-                    if (
-                        activeBot ===
-                        message.botKey
-                    ) {
-
-                        hideLoading();
-                    }
-
-                    break;
-
-
-                case "conversation-closed":
-
-                    state.launchRequested =
-                        false;
-
-
-                    if (
-                        activeBot ===
-                        message.botKey
-                    ) {
-
-                        resetVisibleChat();
-                    }
-
-                    break;
-
-
-                case "chat-error":
-
-                case "initialisation-error":
-
-                    state.ready =
-                        false;
-
-                    state.initializing =
-                        false;
-
-                    state.failed =
-                        true;
-
-                    state.launchRequested =
-                        false;
-
-
-                    console.error(
-                        config.name +
-                        " error:",
-                        message.detail
-                    );
-
-
-                    if (
-                        activeBot ===
-                        message.botKey
-                    ) {
-
-                        showStatus(
-                            config.name +
-                            ": " +
-                            (
-                                message.detail ||
-                                "The deployment failed to load."
-                            )
-                        );
-
-
-                        resetVisibleChat();
-                    }
-
-                    break;
-
-            }
-
-        }
-    );
-
-
-    /*************************************************
-     * START PRELOADING
-     *************************************************/
-
-    if (
-        document.readyState ===
-        "loading"
-    ) {
-
-        document.addEventListener(
-            "DOMContentLoaded",
-            function () {
-
-                preloadAllBots();
-
-            }
-        );
-
-    } else {
-
-        preloadAllBots();
-
-    }
-
-
 })();
-
 </script>
 
 </div>
