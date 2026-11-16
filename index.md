@@ -14,7 +14,7 @@ title: Chat with us
         --bge-panel: #ffffff;
         --bge-close: #f4f4f4;
         --bge-teal: #00b7a5;
-        --bge-purple: #89449b;
+        --bge-purple: #7f3f98;
         --bge-pink: #d5007f;
         --bge-error: #9d1c24;
         --bge-error-background: #fdecec;
@@ -32,57 +32,63 @@ title: Chat with us
     }
 
     /*
-     * SHARED GRADIENT RING
+     * THICK PRODUCTION-STYLE GRADIENT RING
      *
-     * This is owned by the website frontend.
-     * It sits behind:
+     * Outer ring: 84 × 84
+     * Inner custom launcher: 64 × 64
      *
-     * 1. The initial custom speech icon
-     * 2. The minimized Agentforce launcher
-     * 3. The minimized Einstein launcher
+     * Visible ring thickness:
+     * (84 - 64) / 2 = 10px
      */
     #chat-launcher-ring {
         position: fixed;
-        right: 20px;
-        bottom: 20px;
+        right: 14px;
+        bottom: 14px;
         z-index: 999990;
 
         display: block;
 
-        width: 72px;
-        height: 72px;
+        width: 84px;
+        height: 84px;
 
         border-radius: 50%;
 
         background:
             linear-gradient(
                 135deg,
-                #0072bc 0%,
-                #1268b2 30%,
-                #65439e 64%,
+                #0075bd 0%,
+                #006bb4 28%,
+                #4e4aa3 52%,
+                #893e98 72%,
                 #d5007f 100%
             );
 
         box-shadow:
-            0 4px 14px rgba(0, 59, 92, 0.2);
+            0 5px 15px rgba(0, 59, 92, 0.22);
 
         pointer-events: none;
     }
 
     /*
-     * INITIAL CUSTOM LAUNCHER
+     * INITIAL GENERIC LAUNCHER
      *
-     * 62 × 62 sits centrally inside the 72 × 72 ring.
+     * The button is centred inside the 84px ring:
+     *
+     * Ring position: 14px
+     * Button position: 24px
+     * Difference: 10px
      */
     #custom-chat-launcher {
         position: fixed;
-        right: 25px;
-        bottom: 25px;
+        right: 24px;
+        bottom: 24px;
         z-index: 999998;
 
         display: flex;
-        width: 62px;
-        height: 62px;
+
+        width: 64px;
+        height: 64px;
+
         padding: 0;
 
         align-items: center;
@@ -96,7 +102,7 @@ title: Chat with us
         cursor: pointer;
 
         box-shadow:
-            0 2px 8px rgba(0, 59, 92, 0.15);
+            0 2px 7px rgba(0, 59, 92, 0.18);
 
         transition:
             transform 0.15s ease,
@@ -107,14 +113,12 @@ title: Chat with us
         transform: translateY(-1px);
 
         box-shadow:
-            0 4px 12px rgba(0, 59, 92, 0.22);
+            0 4px 12px rgba(0, 59, 92, 0.24);
     }
 
     /*
-     * New speech image.
-     *
-     * The source image is 48 × 48, but it is deliberately
-     * rendered at 38 × 38 to avoid touching the outer ring.
+     * The source image is 48 × 48.
+     * Render at 38 × 38 to preserve white space.
      */
     #custom-chat-launcher img {
         display: block;
@@ -126,7 +130,7 @@ title: Chat with us
     }
 
     /*
-     * CHAT CHOICE WINDOW
+     * CHAT CHOICE PANEL
      */
     #chat-choice-panel {
         position: fixed;
@@ -141,10 +145,7 @@ title: Chat with us
             calc(100vw - 32px)
         );
 
-        padding:
-            8px
-            16px
-            18px;
+        padding: 8px 16px 18px;
 
         border: 1px solid #eeeeee;
         border-radius: 20px 20px 0 0;
@@ -161,7 +162,7 @@ title: Chat with us
     }
 
     /*
-     * LOADING WINDOW
+     * LOADING PANEL
      */
     #chat-loading-panel {
         position: fixed;
@@ -176,10 +177,7 @@ title: Chat with us
             calc(100vw - 32px)
         );
 
-        padding:
-            8px
-            16px
-            20px;
+        padding: 8px 16px 20px;
 
         border: 1px solid #eeeeee;
         border-radius: 20px 20px 0 0;
@@ -195,16 +193,11 @@ title: Chat with us
         display: block;
     }
 
-    /*
-     * TOP HANDLE
-     */
     .chat-top-handle {
         width: 40px;
         height: 4px;
 
-        margin:
-            0 auto
-            12px;
+        margin: 0 auto 12px;
 
         border-radius: 50px;
 
@@ -246,13 +239,9 @@ title: Chat with us
         color: var(--bge-muted);
 
         font-size: 15px;
-        font-weight: 400;
         line-height: 1.35;
     }
 
-    /*
-     * CLOSE BUTTON
-     */
     #chat-choice-close {
         display: flex;
 
@@ -288,29 +277,23 @@ title: Chat with us
         width: 22px;
         height: 22px;
 
-        stroke: currentColor;
-        stroke-width: 2;
-
         fill: none;
 
+        stroke: currentColor;
+        stroke-width: 2;
         stroke-linecap: round;
     }
 
-    /*
-     * DIVIDER
-     */
     #chat-divider {
         height: 1px;
 
-        margin:
-            0 -16px
-            13px;
+        margin: 0 -16px 13px;
 
         background: #e3e3e3;
     }
 
     /*
-     * CHAT OPTIONS
+     * OPTIONS
      */
     #chat-options {
         display: grid;
@@ -323,11 +306,7 @@ title: Chat with us
         width: 100%;
         min-height: 110px;
 
-        padding:
-            17px
-            16px
-            17px
-            12px;
+        padding: 17px 16px 17px 12px;
 
         align-items: center;
 
@@ -371,10 +350,10 @@ title: Chat with us
     .chat-option-icon-shell {
         display: flex;
 
-        width: 46px;
-        height: 46px;
+        width: 50px;
+        height: 50px;
 
-        flex: 0 0 46px;
+        flex: 0 0 50px;
 
         align-items: center;
         justify-content: center;
@@ -384,9 +363,10 @@ title: Chat with us
         background:
             linear-gradient(
                 135deg,
-                #0072bc 0%,
-                #1268b2 30%,
-                #65439e 64%,
+                #0075bd 0%,
+                #006bb4 28%,
+                #4e4aa3 52%,
+                #893e98 72%,
                 #d5007f 100%
             );
     }
@@ -411,9 +391,6 @@ title: Chat with us
         height: 22px;
     }
 
-    /*
-     * OPTION TEXT
-     */
     .chat-option-copy {
         min-width: 0;
         flex: 1;
@@ -437,7 +414,6 @@ title: Chat with us
         color: #555555;
 
         font-size: 15px;
-        font-weight: 400;
         line-height: 1.4;
     }
 
@@ -463,19 +439,12 @@ title: Chat with us
 
         stroke: currentColor;
         stroke-width: 2;
-
         stroke-linecap: round;
         stroke-linejoin: round;
     }
 
-    /*
-     * FOOTNOTE
-     */
     #chat-choice-footnote {
-        margin:
-            13px 0
-            0
-            48px;
+        margin: 13px 0 0 48px;
 
         color: #606060;
 
@@ -501,10 +470,10 @@ title: Chat with us
     #loading-icon-shell {
         display: flex;
 
-        width: 46px;
-        height: 46px;
+        width: 50px;
+        height: 50px;
 
-        flex: 0 0 46px;
+        flex: 0 0 50px;
 
         align-items: center;
         justify-content: center;
@@ -514,9 +483,10 @@ title: Chat with us
         background:
             linear-gradient(
                 135deg,
-                #0072bc 0%,
-                #1268b2 30%,
-                #65439e 64%,
+                #0075bd 0%,
+                #006bb4 28%,
+                #4e4aa3 52%,
+                #893e98 72%,
                 #d5007f 100%
             );
     }
@@ -578,7 +548,7 @@ title: Chat with us
 
         overflow: hidden;
 
-        height: 4px;
+        height: 5px;
 
         margin-top: 18px;
 
@@ -600,9 +570,9 @@ title: Chat with us
         background:
             linear-gradient(
                 90deg,
-                var(--bge-teal),
-                var(--bge-purple),
-                var(--bge-pink)
+                #0075bd,
+                #683f9c,
+                #d5007f
             );
 
         content: "";
@@ -670,9 +640,6 @@ title: Chat with us
         display: block;
     }
 
-    /*
-     * ACCESSIBILITY
-     */
     #custom-chat-launcher:focus-visible,
     #chat-choice-close:focus-visible,
     .chat-option:focus-visible,
@@ -682,12 +649,12 @@ title: Chat with us
     }
 
     /*
-     * MOBILE
+     * MOBILE POSITIONING
      */
     @media (max-width: 600px) {
         #chat-launcher-ring {
-            right: 14px;
-            bottom: 14px;
+            right: 9px;
+            bottom: 9px;
         }
 
         #custom-chat-launcher {
@@ -706,23 +673,18 @@ title: Chat with us
             border-bottom: 0;
             border-left: 0;
 
-            border-radius:
-                20px
-                20px
-                0
-                0;
+            border-radius: 20px 20px 0 0;
         }
     }
 </style>
 
 
 <!--
-    PERSISTENT FRONTEND RING
+    PERSISTENT FRONTEND GRADIENT RING
 
-    The ring is independent of the logo itself.
-
-    When Salesforce is minimized, the native circular ESD
-    launcher is expected to sit over this ring.
+    The ring is intentionally larger than both:
+    - the custom initial launcher
+    - the native minimized Salesforce launcher
 -->
 <div
     id="chat-launcher-ring"
@@ -730,7 +692,7 @@ title: Chat with us
 ></div>
 
 
-<!-- INITIAL CUSTOM CHAT BUTTON -->
+<!-- INITIAL CUSTOM LAUNCHER -->
 
 <button
     id="custom-chat-launcher"
@@ -746,7 +708,7 @@ title: Chat with us
 </button>
 
 
-<!-- CHAT CHOICE PANEL -->
+<!-- CHOICE PANEL -->
 
 <section
     id="chat-choice-panel"
@@ -797,8 +759,6 @@ title: Chat with us
 
     <div id="chat-options">
 
-        <!-- AGENTFORCE -->
-
         <button
             class="chat-option"
             type="button"
@@ -840,8 +800,6 @@ title: Chat with us
             </span>
         </button>
 
-
-        <!-- EINSTEIN -->
 
         <button
             class="chat-option"
@@ -1006,6 +964,7 @@ title: Chat with us
         </div>
 
         <div id="loading-title-copy">
+
             <h2 id="loading-title">
                 Opening chat
             </h2>
@@ -1013,6 +972,7 @@ title: Chat with us
             <p id="loading-subtitle">
                 Connecting to your assistant
             </p>
+
         </div>
 
     </div>
@@ -1049,9 +1009,6 @@ title: Chat with us
 (function () {
     "use strict";
 
-    /*
-     * SALESFORCE CONFIGURATION
-     */
     var ORG_ID =
         "00DRR00000V4G17";
 
@@ -1100,9 +1057,6 @@ title: Chat with us
         }
     };
 
-    /*
-     * DOM
-     */
     var launcherRing =
         document.getElementById(
             "chat-launcher-ring"
@@ -1173,16 +1127,10 @@ title: Chat with us
             "back-to-options"
         );
 
-    /*
-     * STATE
-     */
     var selectedBot =
         null;
 
     var buttonCreated =
-        false;
-
-    var bootstrapLoading =
         false;
 
     var launchRequested =
@@ -1194,9 +1142,6 @@ title: Chat with us
     var initializationTimer =
         null;
 
-    /*
-     * URL HELPERS
-     */
     function getSelectedBotFromURL() {
         var parameters =
             new URLSearchParams(
@@ -1206,11 +1151,9 @@ title: Chat with us
         var botKey =
             parameters.get("bot");
 
-        if (BOT_CONFIG[botKey]) {
-            return botKey;
-        }
-
-        return null;
+        return BOT_CONFIG[botKey]
+            ? botKey
+            : null;
     }
 
     function getCleanURL() {
@@ -1241,9 +1184,6 @@ title: Chat with us
         return url.toString();
     }
 
-    /*
-     * RING VISIBILITY
-     */
     function showLauncherRing() {
         launcherRing.style.display =
             "block";
@@ -1254,9 +1194,6 @@ title: Chat with us
             "none";
     }
 
-    /*
-     * SELECTOR UI
-     */
     function openChoicePanel() {
         choicePanel.classList.add(
             "is-open"
@@ -1302,9 +1239,6 @@ title: Chat with us
         );
     }
 
-    /*
-     * LOADING UI
-     */
     function showLoadingPanel(botKey) {
         var config =
             BOT_CONFIG[botKey];
@@ -1391,9 +1325,6 @@ title: Chat with us
         );
     }
 
-    /*
-     * TIMER
-     */
     function clearInitializationTimer() {
         if (!initializationTimer) {
             return;
@@ -1407,9 +1338,6 @@ title: Chat with us
             null;
     }
 
-    /*
-     * SELECT BOT
-     */
     function selectBot(botKey) {
         if (!BOT_CONFIG[botKey]) {
             return;
@@ -1420,9 +1348,6 @@ title: Chat with us
         );
     }
 
-    /*
-     * HIDE NATIVE SALESFORCE LAUNCHER
-     */
     function hideNativeSalesforceLauncher() {
         if (!buttonCreated) {
             return;
@@ -1446,9 +1371,6 @@ title: Chat with us
         }
     }
 
-    /*
-     * LAUNCH SELECTED CHAT
-     */
     function launchSelectedChat() {
         if (
             !selectedBot ||
@@ -1492,18 +1414,14 @@ title: Chat with us
 
                 hideLoadingPanel();
 
-                /*
-                 * Keep the frontend gradient ring available
-                 * behind Salesforce's minimized launcher.
-                 */
-                showLauncherRing();
-
-                /*
-                 * Keep the custom generic icon hidden because
-                 * the selected Salesforce ESD is active.
-                 */
                 launcher.style.display =
                     "none";
+
+                /*
+                 * The thick ring remains behind the native
+                 * Salesforce launcher before and after minimize.
+                 */
+                showLauncherRing();
             })
             .catch(function (error) {
                 launchStarted =
@@ -1525,9 +1443,6 @@ title: Chat with us
             });
     }
 
-    /*
-     * SALESFORCE EVENTS
-     */
     function addSalesforceEventListeners() {
         window.addEventListener(
             "onEmbeddedMessagingReady",
@@ -1548,17 +1463,9 @@ title: Chat with us
                 buttonCreated =
                     true;
 
-                bootstrapLoading =
-                    false;
-
                 clearInitializationTimer();
 
                 hideNativeSalesforceLauncher();
-
-                console.log(
-                    BOT_CONFIG[selectedBot].name +
-                    " chat button was created."
-                );
 
                 if (launchRequested) {
                     launchSelectedChat();
@@ -1576,14 +1483,10 @@ title: Chat with us
 
                 hideLoadingPanel();
 
-                /*
-                 * The ring remains behind the native Salesforce
-                 * minimized launcher after the user minimizes.
-                 */
-                showLauncherRing();
-
                 launcher.style.display =
                     "none";
+
+                showLauncherRing();
             }
         );
 
@@ -1599,9 +1502,6 @@ title: Chat with us
         );
     }
 
-    /*
-     * INITIALIZE SELECTED DEPLOYMENT
-     */
     function initializeSelectedDeployment() {
         var config =
             BOT_CONFIG[selectedBot];
@@ -1611,14 +1511,12 @@ title: Chat with us
                 "en_US";
 
             /*
-             * Align Salesforce's minimized launcher with
-             * the centre of the frontend gradient ring.
-             *
-             * Format: bottom offset, right offset.
+             * Align the Salesforce launcher centre with the
+             * centre of the 84 × 84 frontend ring.
              */
             embeddedservice_bootstrap.settings
                 .chatButtonPosition =
-                    "25px,25px";
+                    "24px,24px";
 
             embeddedservice_bootstrap.settings
                 .hideChatButtonOnLoad =
@@ -1634,9 +1532,6 @@ title: Chat with us
                 }
             );
         } catch (error) {
-            bootstrapLoading =
-                false;
-
             launchRequested =
                 false;
 
@@ -1658,15 +1553,9 @@ title: Chat with us
         }
     }
 
-    /*
-     * LOAD SELECTED DEPLOYMENT
-     */
     function loadSelectedDeployment() {
         var config =
             BOT_CONFIG[selectedBot];
-
-        bootstrapLoading =
-            true;
 
         launchRequested =
             true;
@@ -1698,9 +1587,6 @@ title: Chat with us
 
         bootstrapScript.onerror =
             function () {
-                bootstrapLoading =
-                    false;
-
                 launchRequested =
                     false;
 
@@ -1720,9 +1606,6 @@ title: Chat with us
             window.setTimeout(
                 function () {
                     if (!buttonCreated) {
-                        bootstrapLoading =
-                            false;
-
                         launchRequested =
                             false;
 
@@ -1732,27 +1615,12 @@ title: Chat with us
                             config.name +
                             " did not become ready. Check the ESD Allowed Domains, deployment status and browser console."
                         );
-
-                        console.error(
-                            config.name +
-                            " initialization timed out.",
-                            {
-                                deploymentName:
-                                    config.deploymentName,
-
-                                siteURL:
-                                    config.siteURL
-                            }
-                        );
                     }
                 },
                 25000
             );
     }
 
-    /*
-     * USER EVENTS
-     */
     launcher.addEventListener(
         "click",
         function () {
@@ -1810,9 +1678,6 @@ title: Chat with us
         }
     );
 
-    /*
-     * NETWORK WARM-UP
-     */
     function addPreconnect(url) {
         var link =
             document.createElement(
@@ -1841,16 +1706,10 @@ title: Chat with us
         "https://bordgaisenergyeandu--afdev2.sandbox.my.salesforce-scrt.com"
     );
 
-    /*
-     * PAGE START
-     */
     selectedBot =
         getSelectedBotFromURL();
 
     if (selectedBot) {
-        /*
-         * Selected ESD mode.
-         */
         launcher.style.display =
             "none";
 
@@ -1858,9 +1717,6 @@ title: Chat with us
 
         loadSelectedDeployment();
     } else {
-        /*
-         * Initial generic launcher mode.
-         */
         launcher.style.display =
             "flex";
 
