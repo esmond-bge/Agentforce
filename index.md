@@ -393,7 +393,11 @@ title: Agentforce
 
         </div>
 
-        <div id="selector-status" role="status" aria-live="polite"></div>
+        <div
+            id="selector-status"
+            role="status"
+            aria-live="polite"
+        ></div>
 
     </div>
 
@@ -424,11 +428,11 @@ title: Agentforce
 
         einstein: {
             name: "Einstein",
-            deploymentName: "BGE_Github_Deployment",
+            deploymentName: "MIAWPOC_GithubEinstein",
             siteURL:
-                "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWBGEGithubDep1791797820412",
+                "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1794841236383",
             bootstrapURL:
-                "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWBGEGithubDep1791797820412/assets/js/bootstrap.min.js"
+                "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1794841236383/assets/js/bootstrap.min.js"
         }
     };
 
@@ -448,24 +452,38 @@ title: Agentforce
         document.querySelectorAll(".bot-choice");
 
     var selectedBot = null;
+
     var bootstrapLoading = false;
+
     var messagingReady = false;
+
+    var buttonCreated = false;
+
     var launchRequested = false;
+
+    var chatOpened = false;
+
     var initializationTimer = null;
 
     function openSelector() {
-        if (selectedBot && messagingReady) {
-            launchSelectedChat();
+        if (
+            selectedBot &&
+            buttonCreated
+        ) {
+            requestChatLaunch();
             return;
         }
 
         selectorWindow.classList.add("is-open");
+
         launcher.style.display = "none";
     }
 
     function minimiseSelector() {
         selectorWindow.classList.remove("is-open");
+
         launcher.style.display = "flex";
+
         launcher.focus();
     }
 
@@ -480,36 +498,67 @@ title: Agentforce
 
     function setLoadingStatus(botName) {
         selectorStatus.classList.remove("is-error");
+
         selectorStatus.classList.add("is-visible");
+
         selectorStatus.textContent =
             "Connecting to " + botName + "...";
     }
 
     function setErrorStatus(message) {
         selectorStatus.classList.add("is-error");
+
         selectorStatus.classList.add("is-visible");
+
         selectorStatus.textContent = message;
     }
 
     function clearStatus() {
         selectorStatus.classList.remove("is-visible");
+
         selectorStatus.classList.remove("is-error");
+
         selectorStatus.textContent = "";
     }
 
     function clearInitializationTimer() {
-        if (initializationTimer) {
-            window.clearTimeout(initializationTimer);
-            initializationTimer = null;
+        if (!initializationTimer) {
+            return;
+        }
+
+        window.clearTimeout(initializationTimer);
+
+        initializationTimer = null;
+    }
+
+    function safelyHideSalesforceButton() {
+        if (!buttonCreated) {
+            return;
+        }
+
+        try {
+            if (
+                window.embeddedservice_bootstrap &&
+                embeddedservice_bootstrap.utilAPI &&
+                typeof embeddedservice_bootstrap.utilAPI
+                    .hideChatButton === "function"
+            ) {
+                embeddedservice_bootstrap.utilAPI
+                    .hideChatButton();
+            }
+        } catch (error) {
+            console.warn(
+                "Unable to hide the Salesforce launcher.",
+                error
+            );
         }
     }
 
     function launchSelectedChat() {
-        if (!selectedBot) {
-            return;
-        }
-
-        if (!messagingReady) {
+        if (
+            !selectedBot ||
+            !buttonCreated
+        ) {
             launchRequested = true;
             return;
         }
@@ -517,8 +566,8 @@ title: Agentforce
         if (
             !window.embeddedservice_bootstrap ||
             !embeddedservice_bootstrap.utilAPI ||
-            typeof embeddedservice_bootstrap.utilAPI.launchChat !==
-                "function"
+            typeof embeddedservice_bootstrap.utilAPI
+                .launchChat !== "function"
         ) {
             disableBotOptions(false);
 
@@ -529,19 +578,17 @@ title: Agentforce
             return;
         }
 
+        launchRequested = false;
+
         embeddedservice_bootstrap.utilAPI
             .launchChat()
             .then(function () {
                 clearInitializationTimer();
+
                 clearStatus();
 
                 selectorWindow.classList.remove("is-open");
 
-                /*
-                 * Keep the custom launcher available.
-                 * If Salesforce is minimized, selecting this launcher
-                 * calls launchChat again and restores the conversation.
-                 */
                 launcher.style.display = "flex";
 
                 disableBotOptions(false);
@@ -554,7 +601,117 @@ title: Agentforce
                         ? error.message
                         : "The selected chat could not be opened."
                 );
+
+                console.error(
+                    "Launch Chat failed:",
+                    error
+                );
             });
+    }
+
+    function requestChatLaunch() {
+        if (!selectedBot) {
+            openSelector();
+            return;
+        }
+
+        if (!buttonCreated) {
+            launchRequested = true;
+
+            setLoadingStatus(
+                BOT_CONFIG[selectedBot].name
+            );
+
+            return;
+        }
+
+        safelyHideSalesforceButton();
+
+        launchSelectedChat();
+    }
+
+    function addMessagingEventListeners() {
+        window.addEventListener(
+            "onEmbeddedMessagingReady",
+            function () {
+                messagingReady = true;
+
+                console.log(
+                    BOT_CONFIG[selectedBot].name +
+                    " messaging runtime is ready."
+                );
+
+                /*
+                 * Do not call hideChatButton or launchChat here.
+                 * Those APIs require the button-created event.
+                 */
+            },
+            { once: true }
+        );
+
+        window.addEventListener(
+            "onEmbeddedMessagingButtonCreated",
+            function () {
+                buttonCreated = true;
+
+                bootstrapLoading = false;
+
+                clearInitializationTimer();
+
+                safelyHideSalesforceButton();
+
+                console.log(
+                    BOT_CONFIG[selectedBot].name +
+                    " chat button was created."
+                );
+
+                if (launchRequested) {
+                    launchSelectedChat();
+                }
+            },
+            { once: true }
+        );
+
+        window.addEventListener(
+            "onEmbeddedMessagingConversationOpened",
+            function () {
+                chatOpened = true;
+
+                clearStatus();
+
+                selectorWindow.classList.remove("is-open");
+
+                launcher.style.display = "flex";
+
+                disableBotOptions(false);
+            }
+        );
+
+        window.addEventListener(
+            "onEmbeddedMessagingConversationClosed",
+            function () {
+                chatOpened = false;
+
+                launchRequested = false;
+
+                clearStatus();
+
+                selectorWindow.classList.remove("is-open");
+
+                launcher.style.display = "flex";
+
+                /*
+                 * The selected Salesforce deployment remains loaded.
+                 * Clicking the custom launcher can start or restore it.
+                 */
+                window.setTimeout(
+                    function () {
+                        safelyHideSalesforceButton();
+                    },
+                    100
+                );
+            }
+        );
     }
 
     function initialiseSelectedBot(botKey) {
@@ -568,15 +725,10 @@ title: Agentforce
             return;
         }
 
-        /*
-         * Enhanced Web Chat exposes one global
-         * embeddedservice_bootstrap runtime.
-         *
-         * Only the selected deployment is initialized.
-         * This avoids the global conflict and avoids placing
-         * Salesforce inside an unsupported nested iframe.
-         */
-        if (selectedBot && selectedBot !== botKey) {
+        if (
+            selectedBot &&
+            selectedBot !== botKey
+        ) {
             setErrorStatus(
                 "A different assistant is already active. Refresh the page to switch assistants."
             );
@@ -585,12 +737,14 @@ title: Agentforce
         }
 
         selectedBot = botKey;
+
         launchRequested = true;
 
         disableBotOptions(true);
+
         setLoadingStatus(config.name);
 
-        if (messagingReady) {
+        if (buttonCreated) {
             launchSelectedChat();
             return;
         }
@@ -601,76 +755,7 @@ title: Agentforce
 
         bootstrapLoading = true;
 
-        window.addEventListener(
-            "onEmbeddedMessagingReady",
-            function handleMessagingReady() {
-                messagingReady = true;
-                bootstrapLoading = false;
-
-                clearInitializationTimer();
-
-                try {
-                    if (
-                        embeddedservice_bootstrap.utilAPI &&
-                        typeof embeddedservice_bootstrap.utilAPI
-                            .hideChatButton === "function"
-                    ) {
-                        embeddedservice_bootstrap.utilAPI
-                            .hideChatButton();
-                    }
-                } catch (error) {
-                    console.warn(
-                        "Unable to hide the Salesforce launcher.",
-                        error
-                    );
-                }
-
-                if (launchRequested) {
-                    launchRequested = false;
-                    launchSelectedChat();
-                }
-            },
-            { once: true }
-        );
-
-        window.addEventListener(
-            "onEmbeddedMessagingButtonCreated",
-            function handleButtonCreated() {
-                try {
-                    if (
-                        embeddedservice_bootstrap.utilAPI &&
-                        typeof embeddedservice_bootstrap.utilAPI
-                            .hideChatButton === "function"
-                    ) {
-                        embeddedservice_bootstrap.utilAPI
-                            .hideChatButton();
-                    }
-                } catch (error) {
-                    console.warn(
-                        "Unable to hide the Salesforce launcher.",
-                        error
-                    );
-                }
-            }
-        );
-
-        window.addEventListener(
-            "onEmbeddedMessagingConversationOpened",
-            function () {
-                clearStatus();
-                selectorWindow.classList.remove("is-open");
-                launcher.style.display = "flex";
-            }
-        );
-
-        window.addEventListener(
-            "onEmbeddedMessagingConversationClosed",
-            function () {
-                clearStatus();
-                selectorWindow.classList.remove("is-open");
-                launcher.style.display = "flex";
-            }
-        );
+        addMessagingEventListeners();
 
         window.initSelectedEmbeddedMessaging = function () {
             try {
@@ -690,9 +775,11 @@ title: Agentforce
                 );
             } catch (error) {
                 bootstrapLoading = false;
+
                 launchRequested = false;
 
                 clearInitializationTimer();
+
                 disableBotOptions(false);
 
                 setErrorStatus(
@@ -703,7 +790,9 @@ title: Agentforce
                 );
 
                 console.error(
-                    "Error initializing " + config.name + ":",
+                    "Error initializing " +
+                    config.name +
+                    ":",
                     error
                 );
             }
@@ -712,60 +801,91 @@ title: Agentforce
         var bootstrapScript =
             document.createElement("script");
 
-        bootstrapScript.type = "text/javascript";
-        bootstrapScript.src = config.bootstrapURL;
-        bootstrapScript.async = true;
+        bootstrapScript.type =
+            "text/javascript";
 
-        bootstrapScript.onload = function () {
-            window.initSelectedEmbeddedMessaging();
-        };
+        bootstrapScript.src =
+            config.bootstrapURL;
 
-        bootstrapScript.onerror = function () {
-            bootstrapLoading = false;
-            launchRequested = false;
+        bootstrapScript.async =
+            true;
 
-            clearInitializationTimer();
-            disableBotOptions(false);
-
-            setErrorStatus(
-                config.name +
-                " bootstrap file could not be loaded."
-            );
-        };
-
-        document.body.appendChild(bootstrapScript);
-
-        initializationTimer = window.setTimeout(
+        bootstrapScript.onload =
             function () {
-                if (!messagingReady) {
-                    bootstrapLoading = false;
-                    launchRequested = false;
+                window.initSelectedEmbeddedMessaging();
+            };
 
-                    disableBotOptions(false);
+        bootstrapScript.onerror =
+            function () {
+                bootstrapLoading = false;
 
-                    setErrorStatus(
-                        config.name +
-                        " did not become ready. Check the Salesforce deployment, Allowed Domains and browser console."
-                    );
-                }
-            },
-            20000
+                launchRequested = false;
+
+                clearInitializationTimer();
+
+                disableBotOptions(false);
+
+                setErrorStatus(
+                    config.name +
+                    " bootstrap file could not be loaded."
+                );
+            };
+
+        document.body.appendChild(
+            bootstrapScript
         );
+
+        initializationTimer =
+            window.setTimeout(
+                function () {
+                    if (!buttonCreated) {
+                        bootstrapLoading = false;
+
+                        launchRequested = false;
+
+                        disableBotOptions(false);
+
+                        setErrorStatus(
+                            config.name +
+                            " did not create the Salesforce chat button. Check the ESD Allowed Domains, deployment status and browser console."
+                        );
+
+                        console.error(
+                            config.name +
+                            " initialization timed out.",
+                            {
+                                messagingReady:
+                                    messagingReady,
+                                buttonCreated:
+                                    buttonCreated,
+                                deploymentName:
+                                    config.deploymentName,
+                                siteURL:
+                                    config.siteURL
+                            }
+                        );
+                    }
+                },
+                25000
+            );
     }
 
-    /*
-     * Preconnect to Salesforce domains.
-     * This does not initialize either deployment, but it can reduce
-     * DNS, TLS and connection setup time after selection.
-     */
     function addPreconnect(url) {
-        var link = document.createElement("link");
+        var link =
+            document.createElement("link");
 
-        link.rel = "preconnect";
-        link.href = url;
-        link.crossOrigin = "anonymous";
+        link.rel =
+            "preconnect";
 
-        document.head.appendChild(link);
+        link.href =
+            url;
+
+        link.crossOrigin =
+            "anonymous";
+
+        document.head.appendChild(
+            link
+        );
     }
 
     addPreconnect(
@@ -779,6 +899,14 @@ title: Agentforce
     launcher.addEventListener(
         "click",
         function () {
+            if (
+                selectedBot &&
+                buttonCreated
+            ) {
+                requestChatLaunch();
+                return;
+            }
+
             openSelector();
         }
     );
@@ -797,7 +925,9 @@ title: Agentforce
                 "click",
                 function () {
                     initialiseSelectedBot(
-                        button.getAttribute("data-bot")
+                        button.getAttribute(
+                            "data-bot"
+                        )
                     );
                 }
             );
@@ -809,7 +939,9 @@ title: Agentforce
         function (event) {
             if (
                 event.key === "Escape" &&
-                selectorWindow.classList.contains("is-open")
+                selectorWindow.classList.contains(
+                    "is-open"
+                )
             ) {
                 minimiseSelector();
             }
