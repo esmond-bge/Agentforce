@@ -10,20 +10,20 @@ title: Agentforce
         position: fixed;
         right: 24px;
         bottom: 24px;
+        z-index: 999998;
+        display: flex;
         width: 64px;
         height: 64px;
         padding: 0;
+        align-items: center;
+        justify-content: center;
         border: 0;
         border-radius: 50%;
         background: #006f44;
         color: #ffffff;
         cursor: pointer;
-        z-index: 999998;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         box-shadow: 0 5px 18px rgba(0, 0, 0, 0.28);
-        transition: transform 0.2s ease, background 0.2s ease;
+        transition: background 0.2s ease, transform 0.2s ease;
     }
 
     #bot-launcher:hover {
@@ -32,9 +32,8 @@ title: Agentforce
     }
 
     #bot-launcher:focus-visible,
-    .bot-option:focus-visible,
     #bot-selector-close:focus-visible,
-    #custom-chat-minimise:focus-visible {
+    .bot-option:focus-visible {
         outline: 3px solid #ffb81c;
         outline-offset: 3px;
     }
@@ -45,65 +44,136 @@ title: Agentforce
         fill: currentColor;
     }
 
-    #bot-selector-backdrop {
+    /*
+     * Bot selection window.
+     * This is positioned and sized like a chat window.
+     */
+    #bot-selector-window {
         position: fixed;
-        inset: 0;
+        right: 24px;
+        bottom: 24px;
         z-index: 999999;
         display: none;
-        align-items: center;
-        justify-content: center;
-        box-sizing: border-box;
-        padding: 20px;
-        background: rgba(0, 0, 0, 0.55);
-    }
-
-    #bot-selector-backdrop.is-open {
-        display: flex;
-    }
-
-    #bot-selector {
-        position: relative;
-        box-sizing: border-box;
-        width: min(420px, 100%);
-        padding: 28px;
+        overflow: hidden;
+        width: min(400px, calc(100vw - 32px));
+        height: min(570px, calc(100vh - 32px));
         border-radius: 16px;
         background: #ffffff;
         color: #1f2937;
         font-family: Arial, sans-serif;
-        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 10px 38px rgba(0, 0, 0, 0.3);
     }
 
-    #bot-selector h2 {
-        margin: 0 40px 8px 0;
-        color: #1f2937;
-        font-size: 24px;
-        line-height: 1.25;
+    #bot-selector-window.is-open {
+        display: flex;
+        flex-direction: column;
     }
 
-    #bot-selector p {
-        margin: 0 0 22px;
-        color: #5f6670;
-        font-size: 15px;
+    #bot-selector-header {
+        display: flex;
+        min-height: 72px;
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px;
+        background: #006f44;
+        color: #ffffff;
+    }
+
+    #bot-selector-header-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    #bot-selector-header-icon {
+        display: flex;
+        width: 38px;
+        height: 38px;
+        flex: 0 0 38px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.16);
+    }
+
+    #bot-selector-header-icon svg {
+        width: 22px;
+        height: 22px;
+        fill: currentColor;
+    }
+
+    #bot-selector-header-text {
+        min-width: 0;
+    }
+
+    #bot-selector-header-text h2 {
+        margin: 0;
+        color: #ffffff;
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    #bot-selector-header-text p {
+        margin: 3px 0 0;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 13px;
+        line-height: 1.3;
     }
 
     #bot-selector-close {
-        position: absolute;
-        top: 14px;
-        right: 14px;
-        width: 38px;
-        height: 38px;
+        display: flex;
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
         padding: 0;
+        align-items: center;
+        justify-content: center;
         border: 0;
         border-radius: 50%;
         background: transparent;
-        color: #30343b;
-        font-size: 28px;
-        line-height: 38px;
+        color: #ffffff;
         cursor: pointer;
     }
 
     #bot-selector-close:hover {
-        background: #f1f3f5;
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    #bot-selector-close svg {
+        width: 22px;
+        height: 22px;
+        fill: currentColor;
+    }
+
+    #bot-selector-body {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        box-sizing: border-box;
+        padding: 24px 20px;
+        background: #f7f8f9;
+    }
+
+    #bot-welcome-message {
+        max-width: 88%;
+        margin-bottom: 22px;
+        padding: 14px 16px;
+        border-radius: 4px 14px 14px 14px;
+        background: #ffffff;
+        color: #30343b;
+        font-size: 15px;
+        line-height: 1.45;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    #bot-welcome-message p {
+        margin: 0;
+    }
+
+    #bot-welcome-message p + p {
+        margin-top: 8px;
     }
 
     .bot-options {
@@ -112,36 +182,88 @@ title: Agentforce
     }
 
     .bot-option {
+        display: flex;
         box-sizing: border-box;
         width: 100%;
-        padding: 16px 18px;
-        border: 2px solid #d8dde2;
+        min-height: 76px;
+        padding: 14px 16px;
+        align-items: center;
+        gap: 14px;
+        border: 1px solid #d5d9dd;
         border-radius: 12px;
         background: #ffffff;
         color: #1f2937;
         font-family: Arial, sans-serif;
         text-align: left;
         cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        transition: border-color 0.2s ease, background 0.2s ease;
     }
 
     .bot-option:hover {
         border-color: #006f44;
-        background: #f3faf6;
+        background: #f2faf6;
+    }
+
+    .bot-option-icon {
+        display: flex;
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #e9f5ef;
+        color: #006f44;
+    }
+
+    .bot-option-icon svg {
+        width: 23px;
+        height: 23px;
+        fill: currentColor;
+    }
+
+    .bot-option-content {
+        min-width: 0;
+        flex: 1;
     }
 
     .bot-option strong {
         display: block;
         margin-bottom: 4px;
         color: #1f2937;
-        font-size: 17px;
+        font-size: 16px;
+        line-height: 1.25;
     }
 
     .bot-option span {
+        display: block;
         color: #646b75;
-        font-size: 14px;
+        font-size: 13px;
+        line-height: 1.35;
     }
 
-    #chat-frame-container {
+    .bot-option-arrow {
+        color: #006f44;
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    #bot-selector-footer {
+        box-sizing: border-box;
+        padding: 14px 18px;
+        border-top: 1px solid #e1e4e8;
+        background: #ffffff;
+        color: #6b7280;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    /*
+     * Salesforce is given the complete iframe.
+     * Nothing is placed over its header or conversation window.
+     */
+    #salesforce-chat-container {
         position: fixed;
         right: 16px;
         bottom: 16px;
@@ -151,57 +273,29 @@ title: Agentforce
         width: min(440px, calc(100vw - 32px));
         height: min(720px, calc(100vh - 32px));
         border-radius: 16px;
-        background: #ffffff;
-        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.28);
+        background: transparent;
     }
 
-    #chat-frame-container.is-open {
+    #salesforce-chat-container.is-open {
         display: block;
     }
 
-    #chat-frame {
+    #salesforce-chat-frame {
         display: block;
         width: 100%;
         height: 100%;
         border: 0;
-        background: #ffffff;
-    }
-
-    #custom-chat-minimise {
-        position: absolute;
-        top: 8px;
-        right: 58px;
-        z-index: 1000003;
-        display: none;
-        width: 40px;
-        height: 36px;
-        padding: 0;
-        border: 0;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.96);
-        color: #202124;
-        font-size: 25px;
-        line-height: 34px;
-        cursor: pointer;
-        box-shadow: 0 2px 7px rgba(0, 0, 0, 0.16);
-    }
-
-    #chat-frame-container.chat-loaded #custom-chat-minimise {
-        display: block;
-    }
-
-    #custom-chat-minimise:hover {
-        background: #f1f3f5;
+        background: transparent;
     }
 
     #chat-loading {
         position: absolute;
         inset: 0;
-        z-index: 1000002;
+        z-index: 2;
         display: flex;
+        box-sizing: border-box;
         align-items: center;
         justify-content: center;
-        box-sizing: border-box;
         padding: 24px;
         background: #ffffff;
         color: #30343b;
@@ -217,7 +311,7 @@ title: Agentforce
         position: fixed;
         left: 16px;
         bottom: 16px;
-        z-index: 1000004;
+        z-index: 1000002;
         display: none;
         max-width: 360px;
         padding: 12px 14px;
@@ -230,17 +324,25 @@ title: Agentforce
     }
 
     @media (max-width: 600px) {
-        #chat-frame-container {
+        #bot-launcher {
+            right: 18px;
+            bottom: 18px;
+        }
+
+        #bot-selector-window {
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: min(620px, 100dvh);
+            border-radius: 16px 16px 0 0;
+        }
+
+        #salesforce-chat-container {
             right: 0;
             bottom: 0;
             width: 100vw;
             height: 100dvh;
             border-radius: 0;
-        }
-
-        #bot-launcher {
-            right: 18px;
-            bottom: 18px;
         }
     }
 </style>
@@ -248,7 +350,7 @@ title: Agentforce
 <button
     id="bot-launcher"
     type="button"
-    aria-label="Open chat options"
+    aria-label="Open chat"
     title="Chat with us"
 >
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -257,24 +359,42 @@ title: Agentforce
 </button>
 
 <div
-    id="bot-selector-backdrop"
+    id="bot-selector-window"
     role="dialog"
-    aria-modal="true"
+    aria-modal="false"
     aria-labelledby="bot-selector-title"
 >
-    <div id="bot-selector">
+    <div id="bot-selector-header">
+        <div id="bot-selector-header-content">
+            <div id="bot-selector-header-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H8l-5 4v-4.5A2 2 0 0 1 2 16V6a2 2 0 0 1 2-2Zm2.5 6a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm5.5 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm5.5 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"></path>
+                </svg>
+            </div>
+
+            <div id="bot-selector-header-text">
+                <h2 id="bot-selector-title">Chat with us</h2>
+                <p>Select an assistant to continue</p>
+            </div>
+        </div>
+
         <button
             id="bot-selector-close"
             type="button"
-            aria-label="Close chat options"
-            title="Close"
+            aria-label="Minimise chat selection"
+            title="Minimise"
         >
-            &times;
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 11h12v2H6z"></path>
+            </svg>
         </button>
+    </div>
 
-        <h2 id="bot-selector-title">How can we help?</h2>
-
-        <p>Select the chat experience you want to launch.</p>
+    <div id="bot-selector-body">
+        <div id="bot-welcome-message">
+            <p><strong>How can we help?</strong></p>
+            <p>Select the assistant you would like to chat with.</p>
+        </div>
 
         <div class="bot-options">
             <button
@@ -282,8 +402,18 @@ title: Agentforce
                 type="button"
                 data-bot="agentforce"
             >
-                <strong>Agentforce</strong>
-                <span>Start the Agentforce conversation.</span>
+                <span class="bot-option-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 2a4 4 0 0 1 4 4v1h1a4 4 0 0 1 4 4v4a4 4 0 0 1-4 4h-1.55L12 22l-3.45-3H7a4 4 0 0 1-4-4v-4a4 4 0 0 1 4-4h1V6a4 4 0 0 1 4-4Zm-2 5h4V6a2 2 0 1 0-4 0v1Zm-3 2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2.3l2.7 2.35L14.7 17H17a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H7Zm1 3h2v2H8v-2Zm6 0h2v2h-2v-2Z"></path>
+                    </svg>
+                </span>
+
+                <span class="bot-option-content">
+                    <strong>Agentforce</strong>
+                    <span>Start the Agentforce conversation.</span>
+                </span>
+
+                <span class="bot-option-arrow" aria-hidden="true">›</span>
             </button>
 
             <button
@@ -291,27 +421,32 @@ title: Agentforce
                 type="button"
                 data-bot="einstein"
             >
-                <strong>Einstein</strong>
-                <span>Start the Einstein conversation.</span>
+                <span class="bot-option-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 2a9 9 0 0 1 9 9c0 3.04-1.51 5.73-3.82 7.36L18 22l-3.75-2A8.92 8.92 0 0 1 12 20a9 9 0 1 1 0-18Zm0 2a7 7 0 1 0 1.82 13.76l.38-.1 1.09.58-.26-1.17.5-.32A7 7 0 0 0 12 4Zm-3 6h2v2H9v-2Zm4 0h2v2h-2v-2Zm-4 4h6v2H9v-2Z"></path>
+                    </svg>
+                </span>
+
+                <span class="bot-option-content">
+                    <strong>Einstein</strong>
+                    <span>Start the Einstein conversation.</span>
+                </span>
+
+                <span class="bot-option-arrow" aria-hidden="true">›</span>
             </button>
         </div>
     </div>
+
+    <div id="bot-selector-footer">
+        Bord Gáis Energy virtual assistance
+    </div>
 </div>
 
-<div id="chat-frame-container">
+<div id="salesforce-chat-container">
     <div id="chat-loading">Loading chat...</div>
 
-    <button
-        id="custom-chat-minimise"
-        type="button"
-        aria-label="Minimise chat"
-        title="Minimise chat"
-    >
-        &minus;
-    </button>
-
     <iframe
-        id="chat-frame"
+        id="salesforce-chat-frame"
         title="Customer chat"
         allow="microphone; camera"
     ></iframe>
@@ -348,43 +483,66 @@ title: Agentforce
         }
     };
 
-    var launcher = document.getElementById("bot-launcher");
-    var selectorBackdrop =
-        document.getElementById("bot-selector-backdrop");
+    var launcher =
+        document.getElementById("bot-launcher");
+
+    var selectorWindow =
+        document.getElementById("bot-selector-window");
+
     var selectorClose =
         document.getElementById("bot-selector-close");
+
     var chatContainer =
-        document.getElementById("chat-frame-container");
+        document.getElementById("salesforce-chat-container");
+
     var chatFrame =
-        document.getElementById("chat-frame");
+        document.getElementById("salesforce-chat-frame");
+
     var chatLoading =
         document.getElementById("chat-loading");
-    var chatMinimise =
-        document.getElementById("custom-chat-minimise");
+
     var chatStatus =
         document.getElementById("chat-status");
+
     var botOptions =
         document.querySelectorAll(".bot-option");
 
     var activeBot = null;
-    var activeFrameLoaded = false;
-    var lastFocusedElement = null;
+    var activeFrameReady = false;
+
+    function showLauncher() {
+        launcher.style.display = "flex";
+    }
+
+    function hideLauncher() {
+        launcher.style.display = "none";
+    }
 
     function openSelector() {
-        lastFocusedElement = document.activeElement;
-        selectorBackdrop.classList.add("is-open");
-        selectorClose.focus();
+        chatContainer.classList.remove("is-open");
+        selectorWindow.classList.add("is-open");
+        hideLauncher();
     }
 
     function closeSelector() {
-        selectorBackdrop.classList.remove("is-open");
+        selectorWindow.classList.remove("is-open");
+        showLauncher();
+        launcher.focus();
+    }
 
-        if (
-            lastFocusedElement &&
-            typeof lastFocusedElement.focus === "function"
-        ) {
-            lastFocusedElement.focus();
-        }
+    function showChatContainer() {
+        selectorWindow.classList.remove("is-open");
+        chatContainer.classList.add("is-open");
+        hideLauncher();
+    }
+
+    function showLoading(message) {
+        chatLoading.textContent = message;
+        chatLoading.classList.remove("is-hidden");
+    }
+
+    function hideLoading() {
+        chatLoading.classList.add("is-hidden");
     }
 
     function showStatus(message) {
@@ -396,39 +554,22 @@ title: Agentforce
         }, 8000);
     }
 
-    function showLoading(message) {
-        chatLoading.textContent = message;
-        chatLoading.classList.remove("is-hidden");
-        chatContainer.classList.remove("chat-loaded");
-    }
+    function resetChat() {
+        activeBot = null;
+        activeFrameReady = false;
 
-    function hideLoading() {
-        chatLoading.classList.add("is-hidden");
-        chatContainer.classList.add("chat-loaded");
-    }
-
-    function showLauncher() {
-        launcher.style.display = "flex";
-    }
-
-    function hideLauncher() {
-        launcher.style.display = "none";
-    }
-
-    function minimiseChat() {
         chatContainer.classList.remove("is-open");
-        showLauncher();
-        launcher.focus();
-    }
+        selectorWindow.classList.remove("is-open");
 
-    function showChatContainer() {
-        closeSelector();
-        hideLauncher();
-        chatContainer.classList.add("is-open");
+        chatFrame.removeAttribute("src");
+        chatFrame.srcdoc = "";
+
+        hideLoading();
+        showLauncher();
     }
 
     function createFrameDocument(config) {
-        var frameConfig = JSON.stringify({
+        var safeConfig = JSON.stringify({
             orgId: ORG_ID,
             deploymentName: config.deploymentName,
             siteURL: config.siteURL,
@@ -450,15 +591,6 @@ title: Agentforce
             "    overflow: hidden;",
             "    background: transparent;",
             "}",
-            "#embeddedMessagingConversationButton,",
-            ".embeddedMessagingConversationButton,",
-            ".embeddedMessagingConversationButtonWrapper,",
-            "button.embeddedMessagingConversationButton {",
-            "    display: none !important;",
-            "    visibility: hidden !important;",
-            "    opacity: 0 !important;",
-            "    pointer-events: none !important;",
-            "}",
             "</style>",
             "</head>",
             "<body>",
@@ -466,11 +598,11 @@ title: Agentforce
             "(function () {",
             "    \"use strict\";",
             "",
-            "    var config = " + frameConfig + ";",
+            "    var config = " + safeConfig + ";",
             "    var launchRequested = false;",
-            "    var buttonCreated = false;",
+            "    var messagingReady = false;",
             "",
-            "    function sendToParent(type, detail) {",
+            "    function notifyParent(type, detail) {",
             "        window.parent.postMessage({",
             "            source: \"bge-embedded-chat\",",
             "            type: type,",
@@ -479,7 +611,7 @@ title: Agentforce
             "        }, \"*\");",
             "    }",
             "",
-            "    function hideSalesforceButton() {",
+            "    function hideNativeLauncher() {",
             "        try {",
             "            if (",
             "                window.embeddedservice_bootstrap &&",
@@ -489,22 +621,26 @@ title: Agentforce
             "                embeddedservice_bootstrap.utilAPI.hideChatButton();",
             "            }",
             "        } catch (error) {",
-            "            console.warn(\"Unable to hide Salesforce chat button.\", error);",
+            "            console.warn(",
+            "                \"The Salesforce launcher could not be hidden.\",",
+            "                error",
+            "            );",
             "        }",
             "    }",
             "",
             "    function launchChat() {",
             "        if (",
+            "            messagingReady &&",
             "            window.embeddedservice_bootstrap &&",
             "            embeddedservice_bootstrap.utilAPI &&",
             "            typeof embeddedservice_bootstrap.utilAPI.launchChat === \"function\"",
             "        ) {",
             "            embeddedservice_bootstrap.utilAPI.launchChat()",
             "                .then(function () {",
-            "                    sendToParent(\"chat-launched\");",
+            "                    notifyParent(\"chat-launched\");",
             "                })",
             "                .catch(function (error) {",
-            "                    sendToParent(",
+            "                    notifyParent(",
             "                        \"chat-error\",",
             "                        error && error.message",
             "                            ? error.message",
@@ -521,9 +657,9 @@ title: Agentforce
             "    window.addEventListener(",
             "        \"onEmbeddedMessagingButtonCreated\",",
             "        function () {",
-            "            buttonCreated = true;",
-            "            hideSalesforceButton();",
-            "            sendToParent(\"chat-ready\");",
+            "            messagingReady = true;",
+            "            hideNativeLauncher();",
+            "            notifyParent(\"chat-ready\");",
             "",
             "            if (launchRequested) {",
             "                launchRequested = false;",
@@ -535,16 +671,15 @@ title: Agentforce
             "    window.addEventListener(",
             "        \"onEmbeddedMessagingConversationOpened\",",
             "        function () {",
-            "            hideSalesforceButton();",
-            "            sendToParent(\"conversation-opened\");",
+            "            notifyParent(\"conversation-opened\");",
             "        }",
             "    );",
             "",
             "    window.addEventListener(",
             "        \"onEmbeddedMessagingConversationClosed\",",
             "        function () {",
-            "            hideSalesforceButton();",
-            "            sendToParent(\"conversation-closed\");",
+            "            hideNativeLauncher();",
+            "            notifyParent(\"conversation-closed\");",
             "        }",
             "    );",
             "",
@@ -558,6 +693,10 @@ title: Agentforce
             "",
             "        if (event.data.type === \"launch-chat\") {",
             "            launchChat();",
+            "        }",
+            "",
+            "        if (event.data.type === \"hide-native-launcher\") {",
+            "            hideNativeLauncher();",
             "        }",
             "    });",
             "",
@@ -574,17 +713,8 @@ title: Agentforce
             "                    scrt2URL: config.scrt2URL",
             "                }",
             "            );",
-            "",
-            "            window.setTimeout(function () {",
-            "                if (!buttonCreated) {",
-            "                    sendToParent(",
-            "                        \"initialisation-timeout\",",
-            "                        \"Salesforce loaded, but the messaging deployment did not become ready.\"",
-            "                    );",
-            "                }",
-            "            }, 20000);",
             "        } catch (error) {",
-            "            sendToParent(",
+            "            notifyParent(",
             "                \"initialisation-error\",",
             "                error && error.message",
             "                    ? error.message",
@@ -599,7 +729,7 @@ title: Agentforce
             "    bootstrapScript.onload = window.initEmbeddedMessaging;",
             "",
             "    bootstrapScript.onerror = function () {",
-            "        sendToParent(",
+            "        notifyParent(",
             "            \"initialisation-error\",",
             "            \"The Salesforce bootstrap file could not be loaded.\"",
             "        );",
@@ -613,7 +743,7 @@ title: Agentforce
         ].join("\n");
     }
 
-    function sendLaunchCommand() {
+    function sendFrameCommand(command) {
         if (!chatFrame.contentWindow) {
             return;
         }
@@ -621,7 +751,7 @@ title: Agentforce
         chatFrame.contentWindow.postMessage(
             {
                 source: "bge-chat-parent",
-                type: "launch-chat"
+                type: command
             },
             "*"
         );
@@ -642,15 +772,15 @@ title: Agentforce
 
         if (
             activeBot === botKey &&
-            activeFrameLoaded &&
+            activeFrameReady &&
             chatFrame.contentWindow
         ) {
-            sendLaunchCommand();
+            sendFrameCommand("launch-chat");
             return;
         }
 
         activeBot = botKey;
-        activeFrameLoaded = false;
+        activeFrameReady = false;
 
         chatFrame.removeAttribute("src");
         chatFrame.srcdoc = createFrameDocument(config);
@@ -659,11 +789,11 @@ title: Agentforce
     launcher.addEventListener("click", function () {
         if (
             activeBot &&
-            activeFrameLoaded &&
+            activeFrameReady &&
             chatFrame.contentWindow
         ) {
             showChatContainer();
-            sendLaunchCommand();
+            sendFrameCommand("launch-chat");
             return;
         }
 
@@ -672,12 +802,6 @@ title: Agentforce
 
     selectorClose.addEventListener("click", function () {
         closeSelector();
-    });
-
-    selectorBackdrop.addEventListener("click", function (event) {
-        if (event.target === selectorBackdrop) {
-            closeSelector();
-        }
     });
 
     Array.prototype.forEach.call(
@@ -689,14 +813,10 @@ title: Agentforce
         }
     );
 
-    chatMinimise.addEventListener("click", function () {
-        minimiseChat();
-    });
-
     window.addEventListener("keydown", function (event) {
         if (
             event.key === "Escape" &&
-            selectorBackdrop.classList.contains("is-open")
+            selectorWindow.classList.contains("is-open")
         ) {
             closeSelector();
         }
@@ -722,8 +842,8 @@ title: Agentforce
 
         switch (message.type) {
             case "chat-ready":
-                activeFrameLoaded = true;
-                sendLaunchCommand();
+                activeFrameReady = true;
+                sendFrameCommand("launch-chat");
                 break;
 
             case "chat-launched":
@@ -732,22 +852,16 @@ title: Agentforce
                 break;
 
             case "conversation-closed":
-                activeBot = null;
-                activeFrameLoaded = false;
-                chatFrame.srcdoc = "";
-                chatContainer.classList.remove("chat-loaded");
-                minimiseChat();
+                resetChat();
                 break;
 
             case "chat-error":
             case "initialisation-error":
-            case "initialisation-timeout":
-                chatLoading.classList.add("is-hidden");
                 showStatus(
                     message.detail ||
                     "An error occurred while loading the selected chat."
                 );
-                minimiseChat();
+                resetChat();
                 break;
         }
     });
