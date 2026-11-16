@@ -1,7 +1,3 @@
----
-layout: default
-title: Agentforce
----
 
 <div markdown="0">
 
@@ -348,7 +344,6 @@ title: Agentforce
         <div id="bot-options">
 
             <button
-                id="agentforce-option"
                 class="bot-choice"
                 type="button"
                 data-bot="agentforce"
@@ -370,7 +365,6 @@ title: Agentforce
             </button>
 
             <button
-                id="einstein-option"
                 class="bot-choice"
                 type="button"
                 data-bot="einstein"
@@ -384,7 +378,7 @@ title: Agentforce
                 <span class="bot-choice-content">
                     <strong>Einstein</strong>
                     <span class="bot-choice-description">
-                        Start the Einstein conversation.
+                        Start the Einstein Virtual Assistant.
                     </span>
                 </span>
 
@@ -452,39 +446,79 @@ title: Agentforce
         document.querySelectorAll(".bot-choice");
 
     var selectedBot = null;
-
     var bootstrapLoading = false;
-
-    var messagingReady = false;
-
     var buttonCreated = false;
-
     var launchRequested = false;
-
-    var chatOpened = false;
-
+    var conversationOpened = false;
+    var conversationEnded = false;
     var initializationTimer = null;
 
-    function openSelector() {
-        if (
-            selectedBot &&
-            buttonCreated
-        ) {
-            requestChatLaunch();
-            return;
+    function getRequestedBot() {
+        var parameters =
+            new URLSearchParams(window.location.search);
+
+        var botKey =
+            parameters.get("chatbot");
+
+        if (BOT_CONFIG[botKey]) {
+            return botKey;
         }
 
-        selectorWindow.classList.add("is-open");
+        return null;
+    }
 
+    function shouldAutoLaunch() {
+        var parameters =
+            new URLSearchParams(window.location.search);
+
+        return parameters.get("autolaunch") === "1";
+    }
+
+    function getCleanPageURL() {
+        return (
+            window.location.origin +
+            window.location.pathname +
+            window.location.hash
+        );
+    }
+
+    function getBotPageURL(botKey) {
+        var url =
+            new URL(
+                window.location.origin +
+                window.location.pathname
+            );
+
+        url.searchParams.set(
+            "chatbot",
+            botKey
+        );
+
+        url.searchParams.set(
+            "autolaunch",
+            "1"
+        );
+
+        return url.toString();
+    }
+
+    function openSelector() {
+        selectorWindow.classList.add("is-open");
         launcher.style.display = "none";
     }
 
-    function minimiseSelector() {
+    function closeSelector() {
         selectorWindow.classList.remove("is-open");
-
         launcher.style.display = "flex";
-
         launcher.focus();
+    }
+
+    function hideCustomLauncher() {
+        launcher.style.display = "none";
+    }
+
+    function showCustomLauncher() {
+        launcher.style.display = "flex";
     }
 
     function disableBotOptions(disabled) {
@@ -498,26 +532,20 @@ title: Agentforce
 
     function setLoadingStatus(botName) {
         selectorStatus.classList.remove("is-error");
-
         selectorStatus.classList.add("is-visible");
-
         selectorStatus.textContent =
             "Connecting to " + botName + "...";
     }
 
     function setErrorStatus(message) {
         selectorStatus.classList.add("is-error");
-
         selectorStatus.classList.add("is-visible");
-
         selectorStatus.textContent = message;
     }
 
     function clearStatus() {
         selectorStatus.classList.remove("is-visible");
-
         selectorStatus.classList.remove("is-error");
-
         selectorStatus.textContent = "";
     }
 
@@ -527,11 +555,10 @@ title: Agentforce
         }
 
         window.clearTimeout(initializationTimer);
-
         initializationTimer = null;
     }
 
-    function safelyHideSalesforceButton() {
+    function hideNativeSalesforceLauncher() {
         if (!buttonCreated) {
             return;
         }
@@ -548,13 +575,44 @@ title: Agentforce
             }
         } catch (error) {
             console.warn(
-                "Unable to hide the Salesforce launcher.",
+                "Unable to hide Salesforce launcher.",
                 error
             );
         }
     }
 
-    function launchSelectedChat() {
+    function showSelectorAfterConversationEnd() {
+        conversationOpened = false;
+        conversationEnded = true;
+        launchRequested = false;
+
+        clearInitializationTimer();
+        clearStatus();
+        disableBotOptions(false);
+
+        selectorWindow.classList.remove("is-open");
+        showCustomLauncher();
+
+        /*
+         * Remove autolaunch parameters without refreshing.
+         * The current Salesforce runtime remains loaded until
+         * another assistant is selected.
+         */
+        window.history.replaceState(
+            {},
+            document.title,
+            getCleanPageURL()
+        );
+
+        window.setTimeout(
+            function () {
+                hideNativeSalesforceLauncher();
+            },
+            150
+        );
+    }
+
+    function launchCurrentBot() {
         if (
             !selectedBot ||
             !buttonCreated
@@ -580,21 +638,31 @@ title: Agentforce
 
         launchRequested = false;
 
+        hideNativeSalesforceLauncher();
+
         embeddedservice_bootstrap.utilAPI
-            .launchChat()
+            .launchChat(
+                conversationEnded
+                    ? { shouldStartNewConversation: true }
+                    : undefined
+            )
             .then(function () {
                 clearInitializationTimer();
-
                 clearStatus();
 
                 selectorWindow.classList.remove("is-open");
 
-                launcher.style.display = "flex";
+                /*
+                 * The custom green launcher must not be visible
+                 * while the native Salesforce chat is launched.
+                 */
+                hideCustomLauncher();
 
                 disableBotOptions(false);
             })
             .catch(function (error) {
                 disableBotOptions(false);
+                showCustomLauncher();
 
                 setErrorStatus(
                     error && error.message
@@ -609,42 +677,14 @@ title: Agentforce
             });
     }
 
-    function requestChatLaunch() {
-        if (!selectedBot) {
-            openSelector();
-            return;
-        }
-
-        if (!buttonCreated) {
-            launchRequested = true;
-
-            setLoadingStatus(
-                BOT_CONFIG[selectedBot].name
-            );
-
-            return;
-        }
-
-        safelyHideSalesforceButton();
-
-        launchSelectedChat();
-    }
-
     function addMessagingEventListeners() {
         window.addEventListener(
             "onEmbeddedMessagingReady",
             function () {
-                messagingReady = true;
-
                 console.log(
                     BOT_CONFIG[selectedBot].name +
                     " messaging runtime is ready."
                 );
-
-                /*
-                 * Do not call hideChatButton or launchChat here.
-                 * Those APIs require the button-created event.
-                 */
             },
             { once: true }
         );
@@ -653,12 +693,10 @@ title: Agentforce
             "onEmbeddedMessagingButtonCreated",
             function () {
                 buttonCreated = true;
-
                 bootstrapLoading = false;
 
                 clearInitializationTimer();
-
-                safelyHideSalesforceButton();
+                hideNativeSalesforceLauncher();
 
                 console.log(
                     BOT_CONFIG[selectedBot].name +
@@ -666,7 +704,7 @@ title: Agentforce
                 );
 
                 if (launchRequested) {
-                    launchSelectedChat();
+                    launchCurrentBot();
                 }
             },
             { once: true }
@@ -675,14 +713,17 @@ title: Agentforce
         window.addEventListener(
             "onEmbeddedMessagingConversationOpened",
             function () {
-                chatOpened = true;
+                conversationOpened = true;
+                conversationEnded = false;
 
                 clearStatus();
-
                 selectorWindow.classList.remove("is-open");
 
-                launcher.style.display = "flex";
-
+                /*
+                 * Hide the generic green icon while Salesforce
+                 * owns the visible chat experience.
+                 */
+                hideCustomLauncher();
                 disableBotOptions(false);
             }
         );
@@ -690,62 +731,52 @@ title: Agentforce
         window.addEventListener(
             "onEmbeddedMessagingConversationClosed",
             function () {
-                chatOpened = false;
-
-                launchRequested = false;
-
-                clearStatus();
-
-                selectorWindow.classList.remove("is-open");
-
-                launcher.style.display = "flex";
-
-                /*
-                 * The selected Salesforce deployment remains loaded.
-                 * Clicking the custom launcher can start or restore it.
-                 */
-                window.setTimeout(
-                    function () {
-                        safelyHideSalesforceButton();
-                    },
-                    100
-                );
+                showSelectorAfterConversationEnd();
             }
         );
     }
 
-    function initialiseSelectedBot(botKey) {
-        var config = BOT_CONFIG[botKey];
+    function initialiseBot(botKey) {
+        var config =
+            BOT_CONFIG[botKey];
 
         if (!config) {
+            openSelector();
+
             setErrorStatus(
-                "The selected chat deployment is not configured."
+                "The selected assistant is not configured."
             );
 
             return;
         }
 
+        /*
+         * If another ESD has already initialized in this page,
+         * perform a clean page navigation before loading the new ESD.
+         *
+         * This prevents the previous deployment and conversation
+         * from being reused when Einstein is selected after Agentforce.
+         */
         if (
             selectedBot &&
             selectedBot !== botKey
         ) {
-            setErrorStatus(
-                "A different assistant is already active. Refresh the page to switch assistants."
+            window.location.assign(
+                getBotPageURL(botKey)
             );
 
             return;
         }
 
         selectedBot = botKey;
-
         launchRequested = true;
 
+        openSelector();
         disableBotOptions(true);
-
         setLoadingStatus(config.name);
 
         if (buttonCreated) {
-            launchSelectedChat();
+            launchCurrentBot();
             return;
         }
 
@@ -754,7 +785,6 @@ title: Agentforce
         }
 
         bootstrapLoading = true;
-
         addMessagingEventListeners();
 
         window.initSelectedEmbeddedMessaging = function () {
@@ -775,12 +805,11 @@ title: Agentforce
                 );
             } catch (error) {
                 bootstrapLoading = false;
-
                 launchRequested = false;
 
                 clearInitializationTimer();
-
                 disableBotOptions(false);
+                showCustomLauncher();
 
                 setErrorStatus(
                     error && error.message
@@ -818,12 +847,11 @@ title: Agentforce
         bootstrapScript.onerror =
             function () {
                 bootstrapLoading = false;
-
                 launchRequested = false;
 
                 clearInitializationTimer();
-
                 disableBotOptions(false);
+                showCustomLauncher();
 
                 setErrorStatus(
                     config.name +
@@ -840,10 +868,10 @@ title: Agentforce
                 function () {
                     if (!buttonCreated) {
                         bootstrapLoading = false;
-
                         launchRequested = false;
 
                         disableBotOptions(false);
+                        showCustomLauncher();
 
                         setErrorStatus(
                             config.name +
@@ -854,10 +882,6 @@ title: Agentforce
                             config.name +
                             " initialization timed out.",
                             {
-                                messagingReady:
-                                    messagingReady,
-                                buttonCreated:
-                                    buttonCreated,
                                 deploymentName:
                                     config.deploymentName,
                                 siteURL:
@@ -868,6 +892,40 @@ title: Agentforce
                 },
                 25000
             );
+    }
+
+    function handleBotSelection(botKey) {
+        if (!BOT_CONFIG[botKey]) {
+            return;
+        }
+
+        /*
+         * After a conversation has ended, always navigate to a clean
+         * copy of the page for the selected ESD.
+         *
+         * This guarantees that choosing Einstein cannot reuse the
+         * Agentforce ESD or the Energy Advisor session.
+         */
+        if (
+            conversationEnded ||
+            (
+                selectedBot &&
+                selectedBot !== botKey
+            )
+        ) {
+            disableBotOptions(true);
+            setLoadingStatus(
+                BOT_CONFIG[botKey].name
+            );
+
+            window.location.assign(
+                getBotPageURL(botKey)
+            );
+
+            return;
+        }
+
+        initialiseBot(botKey);
     }
 
     function addPreconnect(url) {
@@ -899,11 +957,23 @@ title: Agentforce
     launcher.addEventListener(
         "click",
         function () {
+            /*
+             * After End Conversation, always show both options again.
+             */
+            if (conversationEnded) {
+                openSelector();
+                return;
+            }
+
+            /*
+             * A minimized active conversation can be maximized by
+             * calling launchChat again.
+             */
             if (
                 selectedBot &&
                 buttonCreated
             ) {
-                requestChatLaunch();
+                launchCurrentBot();
                 return;
             }
 
@@ -914,7 +984,7 @@ title: Agentforce
     selectorMinimise.addEventListener(
         "click",
         function () {
-            minimiseSelector();
+            closeSelector();
         }
     );
 
@@ -924,7 +994,7 @@ title: Agentforce
             button.addEventListener(
                 "click",
                 function () {
-                    initialiseSelectedBot(
+                    handleBotSelection(
                         button.getAttribute(
                             "data-bot"
                         )
@@ -943,10 +1013,24 @@ title: Agentforce
                     "is-open"
                 )
             ) {
-                minimiseSelector();
+                closeSelector();
             }
         }
     );
+
+    /*
+     * If the page was reloaded with a selected ESD, initialize and
+     * launch that ESD immediately.
+     */
+    var requestedBot =
+        getRequestedBot();
+
+    if (
+        requestedBot &&
+        shouldAutoLaunch()
+    ) {
+        initialiseBot(requestedBot);
+    }
 })();
 </script>
 
