@@ -16,15 +16,10 @@ title: Chat with us
     --bge-error-bg: #fdecec;
 }
 
-/* Persistent decorative gradient ring */
 #chat-launcher-ring {
     position: fixed;
-    right: 14px;
-    bottom: 14px;
     z-index: 999990;
     display: none;
-    width: 84px;
-    height: 84px;
     border-radius: 50%;
     background: linear-gradient(
         135deg,
@@ -34,11 +29,10 @@ title: Chat with us
         #893e98 72%,
         #d5007f 100%
     );
-    box-shadow: 0 5px 15px rgba(0, 59, 92, 0.22);
+    box-shadow: 0 4px 12px rgba(0, 59, 92, 0.20);
     pointer-events: none;
 }
 
-/* Initial custom launcher */
 #custom-chat-launcher {
     position: fixed;
     right: 24px;
@@ -70,7 +64,6 @@ title: Chat with us
     object-fit: contain;
 }
 
-/* Selector and loading panels */
 #chat-choice-panel,
 #chat-loading-panel {
     position: fixed;
@@ -108,7 +101,6 @@ title: Chat with us
     background: #b9b9b5;
 }
 
-/* Selector header */
 #chat-choice-header {
     display: flex;
     align-items: flex-start;
@@ -171,7 +163,6 @@ title: Chat with us
     background: #e3e3e3;
 }
 
-/* Bot options */
 #chat-options {
     display: grid;
     gap: 12px;
@@ -288,7 +279,6 @@ title: Chat with us
     line-height: 1.35;
 }
 
-/* Loading panel */
 #loading-header {
     display: flex;
     align-items: center;
@@ -308,7 +298,6 @@ title: Chat with us
     margin: 0;
     color: var(--bge-muted);
     font-size: 13px;
-    line-height: 1.35;
 }
 
 #loading-body {
@@ -317,7 +306,6 @@ title: Chat with us
 
 #loading-message {
     margin: 0;
-    color: var(--bge-text);
     font-size: 15px;
     line-height: 1.5;
 }
@@ -338,7 +326,12 @@ title: Chat with us
     left: -45%;
     width: 45%;
     border-radius: 20px;
-    background: linear-gradient(90deg, #0075bd, #683f9c, #d5007f);
+    background: linear-gradient(
+        90deg,
+        #0075bd,
+        #683f9c,
+        #d5007f
+    );
     content: "";
     animation: loading-slide 1.15s ease-in-out infinite;
 }
@@ -356,7 +349,6 @@ title: Chat with us
     background: var(--bge-error-bg);
     color: var(--bge-error);
     font-size: 13px;
-    line-height: 1.45;
 }
 
 #chat-error-message.visible {
@@ -390,16 +382,6 @@ title: Chat with us
 }
 
 @media (max-width: 600px) {
-    #chat-launcher-ring {
-        right: 9px;
-        bottom: 9px;
-    }
-
-    #custom-chat-launcher {
-        right: 19px;
-        bottom: 19px;
-    }
-
     #chat-choice-panel,
     #chat-loading-panel {
         right: 0;
@@ -413,10 +395,11 @@ title: Chat with us
 }
 </style>
 
-<!-- Frontend gradient ring -->
-<div id="chat-launcher-ring" aria-hidden="true"></div>
+<div
+    id="chat-launcher-ring"
+    aria-hidden="true"
+></div>
 
-<!-- Initial custom launcher -->
 <button
     id="custom-chat-launcher"
     type="button"
@@ -430,35 +413,40 @@ title: Chat with us
     >
 </button>
 
-<!-- Bot selector -->
 <section
     id="chat-choice-panel"
     role="dialog"
     aria-modal="false"
     aria-labelledby="chat-choice-title"
 >
-    <div class="chat-top-handle" aria-hidden="true"></div>
+    <div class="chat-top-handle"></div>
 
     <div id="chat-choice-header">
+
         <div id="chat-heading-content">
-            <h2 id="chat-choice-title">Chat with us</h2>
-            <p>Choose what you need help with</p>
+            <h2 id="chat-choice-title">
+                Chat with us
+            </h2>
+
+            <p>
+                Choose what you need help with
+            </p>
         </div>
 
         <button
             id="chat-choice-close"
             type="button"
             aria-label="Close chat options"
-            title="Close"
         >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
                 <path d="M7 7l10 10"></path>
                 <path d="M17 7L7 17"></path>
             </svg>
         </button>
+
     </div>
 
-    <div id="chat-divider" aria-hidden="true"></div>
+    <div id="chat-divider"></div>
 
     <div id="chat-options">
 
@@ -467,7 +455,7 @@ title: Chat with us
             type="button"
             data-bot="agentforce"
         >
-            <span class="chat-option-icon-shell" aria-hidden="true">
+            <span class="chat-option-icon-shell">
                 <span class="chat-option-icon-inner">
                     <svg viewBox="0 0 24 24">
                         <path
@@ -479,7 +467,10 @@ title: Chat with us
             </span>
 
             <span class="chat-option-copy">
-                <strong>Explore plans &amp; switch</strong>
+                <strong>
+                    Explore plans &amp; switch
+                </strong>
+
                 <span>
                     New or existing customer?<br>
                     Compare plans, renew or check<br>
@@ -487,7 +478,7 @@ title: Chat with us
                 </span>
             </span>
 
-            <span class="chat-option-chevron" aria-hidden="true">
+            <span class="chat-option-chevron">
                 <svg viewBox="0 0 24 24">
                     <path d="M9 6l6 6-6 6"></path>
                 </svg>
@@ -499,9 +490,9 @@ title: Chat with us
             type="button"
             data-bot="einstein"
         >
-            <span class="chat-option-icon-shell" aria-hidden="true">
+            <span class="chat-option-icon-shell">
                 <span class="chat-option-icon-inner">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
                         <g
                             fill="none"
                             stroke="currentColor"
@@ -523,14 +514,17 @@ title: Chat with us
             </span>
 
             <span class="chat-option-copy">
-                <strong>Help with my account</strong>
+                <strong>
+                    Help with my account
+                </strong>
+
                 <span>
                     Bills, payments, meter reads and<br>
                     more
                 </span>
             </span>
 
-            <span class="chat-option-chevron" aria-hidden="true">
+            <span class="chat-option-chevron">
                 <svg viewBox="0 0 24 24">
                     <path d="M9 6l6 6-6 6"></path>
                 </svg>
@@ -544,12 +538,15 @@ title: Chat with us
     </p>
 </section>
 
-<!-- Loading panel -->
-<section id="chat-loading-panel" aria-labelledby="loading-title">
-    <div class="chat-top-handle" aria-hidden="true"></div>
+<section
+    id="chat-loading-panel"
+    aria-labelledby="loading-title"
+>
+    <div class="chat-top-handle"></div>
 
     <div id="loading-header">
-        <div id="loading-icon-shell" aria-hidden="true">
+
+        <div id="loading-icon-shell">
             <div id="loading-icon-inner">
 
                 <svg id="loading-agentforce-icon" viewBox="0 0 24 24">
@@ -586,27 +583,37 @@ title: Chat with us
         </div>
 
         <div id="loading-title-copy">
-            <h2 id="loading-title">Opening chat</h2>
-            <p id="loading-subtitle">Connecting to your assistant</p>
+            <h2 id="loading-title">
+                Opening chat
+            </h2>
+
+            <p id="loading-subtitle">
+                Connecting to your assistant
+            </p>
         </div>
+
     </div>
 
     <div id="loading-body">
+
         <p id="loading-message">
             Please wait while the conversation opens.
         </p>
 
-        <div id="loading-progress" aria-hidden="true"></div>
+        <div id="loading-progress"></div>
 
         <div
             id="chat-error-message"
             role="alert"
-            aria-live="assertive"
         ></div>
 
-        <button id="back-to-options" type="button">
+        <button
+            id="back-to-options"
+            type="button"
+        >
             Back to chat options
         </button>
+
     </div>
 </section>
 
@@ -614,7 +621,8 @@ title: Chat with us
 (function () {
     "use strict";
 
-    var ORG_ID = "00DRR00000V4G17";
+    var ORG_ID =
+        "00DRR00000V4G17";
 
     var SCRT2_URL =
         "https://bordgaisenergyeandu--afdev2.sandbox.my.salesforce-scrt.com";
@@ -624,7 +632,8 @@ title: Chat with us
             name: "Agentforce",
             title: "Explore plans & switch",
             subtitle: "Connecting to Agentforce",
-            deploymentName: "MIAWPOC_Github",
+            deploymentName:
+                "MIAWPOC_Github",
             siteURL:
                 "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1793617406174",
             bootstrapURL:
@@ -635,7 +644,8 @@ title: Chat with us
             name: "Einstein",
             title: "Help with my account",
             subtitle: "Connecting to Virtual Assistant",
-            deploymentName: "MIAWPOC_GithubEinstein",
+            deploymentName:
+                "MIAWPOC_GithubEinstein",
             siteURL:
                 "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com/ESWMIAWPOCGithub1794841236383",
             bootstrapURL:
@@ -644,46 +654,74 @@ title: Chat with us
     };
 
     var launcherRing =
-        document.getElementById("chat-launcher-ring");
+        document.getElementById(
+            "chat-launcher-ring"
+        );
 
     var launcher =
-        document.getElementById("custom-chat-launcher");
+        document.getElementById(
+            "custom-chat-launcher"
+        );
 
     var choicePanel =
-        document.getElementById("chat-choice-panel");
+        document.getElementById(
+            "chat-choice-panel"
+        );
 
     var choiceClose =
-        document.getElementById("chat-choice-close");
+        document.getElementById(
+            "chat-choice-close"
+        );
 
     var chatOptions =
-        document.querySelectorAll(".chat-option");
+        document.querySelectorAll(
+            ".chat-option"
+        );
 
     var loadingPanel =
-        document.getElementById("chat-loading-panel");
+        document.getElementById(
+            "chat-loading-panel"
+        );
 
     var loadingTitle =
-        document.getElementById("loading-title");
+        document.getElementById(
+            "loading-title"
+        );
 
     var loadingSubtitle =
-        document.getElementById("loading-subtitle");
+        document.getElementById(
+            "loading-subtitle"
+        );
 
     var loadingMessage =
-        document.getElementById("loading-message");
+        document.getElementById(
+            "loading-message"
+        );
 
     var loadingProgress =
-        document.getElementById("loading-progress");
+        document.getElementById(
+            "loading-progress"
+        );
 
     var agentforceLoadingIcon =
-        document.getElementById("loading-agentforce-icon");
+        document.getElementById(
+            "loading-agentforce-icon"
+        );
 
     var einsteinLoadingIcon =
-        document.getElementById("loading-einstein-icon");
+        document.getElementById(
+            "loading-einstein-icon"
+        );
 
     var errorMessage =
-        document.getElementById("chat-error-message");
+        document.getElementById(
+            "chat-error-message"
+        );
 
     var backButton =
-        document.getElementById("back-to-options");
+        document.getElementById(
+            "back-to-options"
+        );
 
     var selectedBot = null;
     var buttonCreated = false;
@@ -694,14 +732,16 @@ title: Chat with us
     var ringSyncTimer = null;
 
     function getSelectedBotFromURL() {
-        var parameters =
-            new URLSearchParams(window.location.search);
+        var params =
+            new URLSearchParams(
+                window.location.search
+            );
 
-        var botKey =
-            parameters.get("bot");
+        var bot =
+            params.get("bot");
 
-        return BOT_CONFIG[botKey]
-            ? botKey
+        return BOT_CONFIG[bot]
+            ? bot
             : null;
     }
 
@@ -715,7 +755,9 @@ title: Chat with us
 
     function getBotURL(botKey) {
         var url =
-            new URL(window.location.href);
+            new URL(
+                window.location.href
+            );
 
         url.search = "";
         url.hash = "";
@@ -728,98 +770,185 @@ title: Chat with us
         return url.toString();
     }
 
-    function showLauncherRing() {
+    function showRing() {
         launcherRing.style.display =
             "block";
     }
 
-    function hideLauncherRing() {
+    function hideRing() {
         launcherRing.style.display =
             "none";
     }
 
-    /*
-     * Find Salesforce's native minimized launcher.
-     */
-    function getNativeSalesforceButton() {
-        return (
-            document.querySelector(
-                "#embeddedMessagingConversationButton"
-            ) ||
-            document.querySelector(
-                ".embeddedMessagingConversationButton"
-            ) ||
-            document.querySelector(
-                "button[class*='embeddedMessagingConversationButton']"
-            )
-        );
+    function positionRingAroundRect(
+        rect,
+        padding
+    ) {
+        var diameter =
+            Math.max(
+                rect.width,
+                rect.height
+            );
+
+        var ringDiameter =
+            diameter +
+            padding * 2;
+
+        var centerX =
+            rect.left +
+            rect.width / 2;
+
+        var centerY =
+            rect.top +
+            rect.height / 2;
+
+        launcherRing.style.width =
+            ringDiameter + "px";
+
+        launcherRing.style.height =
+            ringDiameter + "px";
+
+        launcherRing.style.left =
+            (
+                centerX -
+                ringDiameter / 2
+            ) + "px";
+
+        launcherRing.style.top =
+            (
+                centerY -
+                ringDiameter / 2
+            ) + "px";
+
+        launcherRing.style.right =
+            "auto";
+
+        launcherRing.style.bottom =
+            "auto";
+
+        showRing();
     }
 
     /*
-     * Return true only when Salesforce's native minimized
-     * launcher is actually visible.
+     * Salesforce Enhanced Web Chat has used slightly
+     * different button structures across versions.
+     *
+     * Check several known/sensible selectors.
      */
-    function isNativeSalesforceButtonVisible() {
-        var nativeButton =
-            getNativeSalesforceButton();
+    function getNativeButton() {
+        var selectors = [
+            "#embeddedMessagingConversationButton",
+            ".embeddedMessagingConversationButton",
+            "button.embeddedMessagingConversationButton",
+            "[class*='embeddedMessagingConversationButton']"
+        ];
 
-        if (!nativeButton) {
+        for (
+            var index = 0;
+            index < selectors.length;
+            index++
+        ) {
+            var candidate =
+                document.querySelector(
+                    selectors[index]
+                );
+
+            if (candidate) {
+                return candidate;
+            }
+        }
+
+        return null;
+    }
+
+    function elementIsVisible(element) {
+        if (!element) {
             return false;
         }
 
         var style =
             window.getComputedStyle(
-                nativeButton
+                element
             );
 
         var rect =
-            nativeButton.getBoundingClientRect();
+            element.getBoundingClientRect();
 
         return (
             style.display !== "none" &&
             style.visibility !== "hidden" &&
-            parseFloat(
-                style.opacity || "1"
-            ) > 0 &&
+            Number(style.opacity || 1) > 0 &&
             rect.width > 0 &&
             rect.height > 0
         );
     }
 
     /*
-     * Ring visibility rules:
+     * IMPORTANT:
      *
-     * Initial page:
-     * ring visible behind custom launcher.
+     * GENERIC STATE:
+     * ring surrounds our launcher.
      *
-     * Salesforce maximized:
-     * ring hidden.
+     * ACTIVE CHAT MAXIMIZED:
+     * Salesforce launcher isn't visible.
+     * ring disappears.
      *
-     * Salesforce minimized:
-     * ring visible behind native launcher.
+     * ACTIVE CHAT MINIMIZED:
+     * detect actual Salesforce launcher,
+     * measure it and place ring behind it.
+     *
+     * This works independently for both
+     * Agentforce and Einstein.
      */
-    function syncLauncherRing() {
+    function syncRing() {
         if (!selectedBot) {
             if (
-                launcher.style.display !== "none" &&
-                !choicePanel.classList.contains("is-open") &&
-                !loadingPanel.classList.contains("is-open")
+                elementIsVisible(
+                    launcher
+                ) &&
+                !choicePanel.classList.contains(
+                    "is-open"
+                ) &&
+                !loadingPanel.classList.contains(
+                    "is-open"
+                )
             ) {
-                showLauncherRing();
+                positionRingAroundRect(
+                    launcher.getBoundingClientRect(),
+                    8
+                );
             } else {
-                hideLauncherRing();
+                hideRing();
             }
 
             return;
         }
 
+        var nativeButton =
+            getNativeButton();
+
         if (
-            isNativeSalesforceButtonVisible()
+            nativeButton &&
+            elementIsVisible(
+                nativeButton
+            )
         ) {
-            showLauncherRing();
-        } else {
-            hideLauncherRing();
+            /*
+             * 8px visible production-style
+             * gradient around Salesforce's button.
+             */
+            positionRingAroundRect(
+                nativeButton.getBoundingClientRect(),
+                8
+            );
+
+            return;
         }
+
+        /*
+         * Full Salesforce chat is open.
+         */
+        hideRing();
     }
 
     function scheduleRingSync() {
@@ -831,21 +960,19 @@ title: Chat with us
 
         ringSyncTimer =
             window.setTimeout(
-                syncLauncherRing,
-                20
+                syncRing,
+                25
             );
     }
 
-    function startLauncherObserver() {
+    function startRingObserver() {
         if (launcherObserver) {
             return;
         }
 
         launcherObserver =
             new MutationObserver(
-                function () {
-                    scheduleRingSync();
-                }
+                scheduleRingSync
             );
 
         launcherObserver.observe(
@@ -867,8 +994,6 @@ title: Chat with us
             "resize",
             scheduleRingSync
         );
-
-        scheduleRingSync();
     }
 
     function openChoicePanel() {
@@ -883,14 +1008,7 @@ title: Chat with us
         launcher.style.display =
             "none";
 
-        hideLauncherRing();
-
-        window.setTimeout(
-            function () {
-                choiceClose.focus();
-            },
-            10
-        );
+        hideRing();
     }
 
     function closeChoicePanel() {
@@ -902,11 +1020,11 @@ title: Chat with us
             "flex";
 
         scheduleRingSync();
-
-        launcher.focus();
     }
 
-    function disableOptions(disabled) {
+    function disableOptions(
+        disabled
+    ) {
         Array.prototype.forEach.call(
             chatOptions,
             function (option) {
@@ -916,7 +1034,9 @@ title: Chat with us
         );
     }
 
-    function showLoadingPanel(botKey) {
+    function showLoadingPanel(
+        botKey
+    ) {
         var config =
             BOT_CONFIG[botKey];
 
@@ -931,7 +1051,7 @@ title: Chat with us
         launcher.style.display =
             "none";
 
-        hideLauncherRing();
+        hideRing();
 
         loadingTitle.textContent =
             config.title;
@@ -956,7 +1076,10 @@ title: Chat with us
             "visible"
         );
 
-        if (botKey === "agentforce") {
+        if (
+            botKey ===
+            "agentforce"
+        ) {
             agentforceLoadingIcon.style.display =
                 "block";
 
@@ -979,7 +1102,7 @@ title: Chat with us
         scheduleRingSync();
     }
 
-    function clearInitializationTimer() {
+    function clearTimer() {
         if (!initializationTimer) {
             return;
         }
@@ -992,8 +1115,10 @@ title: Chat with us
             null;
     }
 
-    function showError(message) {
-        clearInitializationTimer();
+    function showError(
+        message
+    ) {
+        clearTimer();
 
         showLoadingPanel(
             selectedBot
@@ -1017,17 +1142,21 @@ title: Chat with us
         );
     }
 
-    function selectBot(botKey) {
+    function selectBot(
+        botKey
+    ) {
         if (!BOT_CONFIG[botKey]) {
             return;
         }
 
         window.location.assign(
-            getBotURL(botKey)
+            getBotURL(
+                botKey
+            )
         );
     }
 
-    function hideNativeSalesforceLauncher() {
+    function hideNativeButton() {
         if (!buttonCreated) {
             return;
         }
@@ -1036,10 +1165,13 @@ title: Chat with us
             if (
                 window.embeddedservice_bootstrap &&
                 embeddedservice_bootstrap.utilAPI &&
-                typeof embeddedservice_bootstrap.utilAPI
-                    .hideChatButton === "function"
+                typeof embeddedservice_bootstrap
+                    .utilAPI
+                    .hideChatButton ===
+                    "function"
             ) {
-                embeddedservice_bootstrap.utilAPI
+                embeddedservice_bootstrap
+                    .utilAPI
                     .hideChatButton();
             }
         } catch (error) {
@@ -1050,12 +1182,14 @@ title: Chat with us
         }
     }
 
-    function launchSelectedChat() {
+    function launchChat() {
         if (
             !selectedBot ||
             !buttonCreated
         ) {
-            launchRequested = true;
+            launchRequested =
+                true;
+
             return;
         }
 
@@ -1063,29 +1197,20 @@ title: Chat with us
             return;
         }
 
-        if (
-            !window.embeddedservice_bootstrap ||
-            !embeddedservice_bootstrap.utilAPI ||
-            typeof embeddedservice_bootstrap.utilAPI
-                .launchChat !== "function"
-        ) {
-            showError(
-                "Salesforce loaded, but the Launch Chat API is unavailable."
-            );
+        launchRequested =
+            false;
 
-            return;
-        }
+        launchStarted =
+            true;
 
-        launchRequested = false;
-        launchStarted = true;
+        hideNativeButton();
+        hideRing();
 
-        hideNativeSalesforceLauncher();
-        hideLauncherRing();
-
-        embeddedservice_bootstrap.utilAPI
+        embeddedservice_bootstrap
+            .utilAPI
             .launchChat()
             .then(function () {
-                clearInitializationTimer();
+                clearTimer();
 
                 hideLoadingPanel();
 
@@ -1093,60 +1218,45 @@ title: Chat with us
                     "none";
 
                 /*
-                 * The conversation opens maximized.
-                 * Keep the ring hidden until the native
-                 * minimized launcher becomes visible.
+                 * Chat launches maximized.
+                 * No ring here.
                  */
-                hideLauncherRing();
+                hideRing();
 
                 scheduleRingSync();
             })
             .catch(function (error) {
-                launchStarted = false;
+                launchStarted =
+                    false;
 
-                hideLauncherRing();
+                hideRing();
 
                 showError(
-                    error && error.message
+                    error &&
+                    error.message
                         ? error.message
-                        : BOT_CONFIG[selectedBot].name +
-                          " could not be opened."
-                );
-
-                console.error(
-                    "Launch Chat failed:",
-                    error
+                        : "Chat could not be opened."
                 );
             });
     }
 
-    function addSalesforceEventListeners() {
-        window.addEventListener(
-            "onEmbeddedMessagingReady",
-            function () {
-                console.log(
-                    BOT_CONFIG[selectedBot].name +
-                    " messaging runtime is ready."
-                );
-            },
-            {
-                once: true
-            }
-        );
-
+    function addSalesforceEvents() {
         window.addEventListener(
             "onEmbeddedMessagingButtonCreated",
             function () {
-                buttonCreated = true;
+                buttonCreated =
+                    true;
 
-                clearInitializationTimer();
+                clearTimer();
 
-                hideNativeSalesforceLauncher();
+                hideNativeButton();
 
                 scheduleRingSync();
 
-                if (launchRequested) {
-                    launchSelectedChat();
+                if (
+                    launchRequested
+                ) {
+                    launchChat();
                 }
             },
             {
@@ -1157,7 +1267,7 @@ title: Chat with us
         window.addEventListener(
             "onEmbeddedMessagingConversationOpened",
             function () {
-                clearInitializationTimer();
+                clearTimer();
 
                 hideLoadingPanel();
 
@@ -1165,11 +1275,9 @@ title: Chat with us
                     "none";
 
                 /*
-                 * Fix for the screenshot:
-                 * do not show a separate gradient ball while
-                 * the chat window is maximized.
+                 * Full window is open.
                  */
-                hideLauncherRing();
+                hideRing();
 
                 scheduleRingSync();
             }
@@ -1178,7 +1286,7 @@ title: Chat with us
         window.addEventListener(
             "onEmbeddedMessagingConversationClosed",
             function () {
-                clearInitializationTimer();
+                clearTimer();
 
                 window.location.replace(
                     getCleanURL()
@@ -1187,23 +1295,29 @@ title: Chat with us
         );
     }
 
-    function initializeSelectedDeployment() {
+    function initializeDeployment() {
         var config =
-            BOT_CONFIG[selectedBot];
+            BOT_CONFIG[
+                selectedBot
+            ];
 
         try {
-            embeddedservice_bootstrap.settings.language =
-                "en_US";
+            embeddedservice_bootstrap
+                .settings
+                .language =
+                    "en_US";
 
             /*
-             * Salesforce format is:
-             * bottom offset, right offset.
+             * This is Salesforce's native
+             * minimized button position.
              */
-            embeddedservice_bootstrap.settings
+            embeddedservice_bootstrap
+                .settings
                 .chatButtonPosition =
                     "24px,24px";
 
-            embeddedservice_bootstrap.settings
+            embeddedservice_bootstrap
+                .settings
                 .hideChatButtonOnLoad =
                     true;
 
@@ -1217,84 +1331,83 @@ title: Chat with us
                 }
             );
         } catch (error) {
-            launchRequested = false;
+            launchRequested =
+                false;
 
-            hideLauncherRing();
+            hideRing();
 
             showError(
-                error && error.message
+                error &&
+                error.message
                     ? error.message
-                    : config.name +
-                      " failed to initialize."
-            );
-
-            console.error(
-                "Error initializing " +
-                config.name +
-                ":",
-                error
+                    : "Chat failed to initialize."
             );
         }
     }
 
     function loadSelectedDeployment() {
         var config =
-            BOT_CONFIG[selectedBot];
+            BOT_CONFIG[
+                selectedBot
+            ];
 
-        launchRequested = true;
+        launchRequested =
+            true;
 
         showLoadingPanel(
             selectedBot
         );
 
-        addSalesforceEventListeners();
+        addSalesforceEvents();
 
-        var bootstrapScript =
+        var script =
             document.createElement(
                 "script"
             );
 
-        bootstrapScript.type =
+        script.type =
             "text/javascript";
 
-        bootstrapScript.src =
+        script.src =
             config.bootstrapURL;
 
-        bootstrapScript.async =
+        script.async =
             true;
 
-        bootstrapScript.onload =
-            function () {
-                initializeSelectedDeployment();
-            };
+        script.onload =
+            initializeDeployment;
 
-        bootstrapScript.onerror =
+        script.onerror =
             function () {
-                launchRequested = false;
+                launchRequested =
+                    false;
 
-                hideLauncherRing();
+                hideRing();
 
                 showError(
                     config.name +
-                    " bootstrap file could not be loaded."
+                    " could not be loaded."
                 );
             };
 
         document.body.appendChild(
-            bootstrapScript
+            script
         );
 
         initializationTimer =
             window.setTimeout(
                 function () {
-                    if (!buttonCreated) {
-                        launchRequested = false;
+                    if (
+                        !buttonCreated
+                    ) {
+                        launchRequested =
+                            false;
 
-                        hideLauncherRing();
+                        hideRing();
 
                         showError(
                             config.name +
-                            " did not become ready. Check the ESD Allowed Domains, deployment status and browser console."
+                            " did not become ready."
                         );
                     }
                 },
@@ -1318,7 +1431,9 @@ title: Chat with us
             option.addEventListener(
                 "click",
                 function () {
-                    disableOptions(true);
+                    disableOptions(
+                        true
+                    );
 
                     selectBot(
                         option.getAttribute(
@@ -1339,44 +1454,7 @@ title: Chat with us
         }
     );
 
-    window.addEventListener(
-        "keydown",
-        function (event) {
-            if (
-                event.key === "Escape" &&
-                choicePanel.classList.contains(
-                    "is-open"
-                )
-            ) {
-                closeChoicePanel();
-            }
-        }
-    );
-
-    function addPreconnect(url) {
-        var link =
-            document.createElement(
-                "link"
-            );
-
-        link.rel = "preconnect";
-        link.href = url;
-        link.crossOrigin = "anonymous";
-
-        document.head.appendChild(
-            link
-        );
-    }
-
-    addPreconnect(
-        "https://bordgaisenergyeandu--afdev2.sandbox.my.site.com"
-    );
-
-    addPreconnect(
-        "https://bordgaisenergyeandu--afdev2.sandbox.my.salesforce-scrt.com"
-    );
-
-    startLauncherObserver();
+    startRingObserver();
 
     selectedBot =
         getSelectedBotFromURL();
@@ -1385,7 +1463,7 @@ title: Chat with us
         launcher.style.display =
             "none";
 
-        hideLauncherRing();
+        hideRing();
 
         loadSelectedDeployment();
     } else {
