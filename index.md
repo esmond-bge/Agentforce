@@ -14,69 +14,94 @@ title: Chat with us
         --bge-teal: #00b7a5;
         --bge-error: #9d1c24;
         --bge-error-background: #fdecec;
+
+        --launcher-size: 64px;
+        --launcher-ring-size: 8px;
+
+        --launcher-gradient:
+            conic-gradient(
+                from 210deg,
+                #0075bd 0deg,
+                #006bb4 105deg,
+                #4e4aa3 190deg,
+                #893e98 270deg,
+                #d5007f 340deg,
+                #0075bd 360deg
+            );
     }
 
     /*
-     * The Salesforce minimized launcher is positioned at:
+     * IMPORTANT
      *
-     * bottom: 24px
-     * right: 24px
+     * There is no separate fixed gradient-circle element.
      *
-     * A typical Salesforce launcher is approximately 60px.
-     * This 78px ring is centred behind that launcher.
+     * The gradient is attached directly to:
+     * 1. The initial custom launcher.
+     * 2. The Salesforce minimized launcher.
      *
-     * The lower z-index is intentional:
-     * - the maximized Salesforce chat appears above the ring
-     * - the minimized Salesforce button appears above the ring
+     * Therefore, when Salesforce hides its launcher while the
+     * conversation is maximized, the gradient disappears too.
      */
-    #chat-launcher-ring {
-        position: fixed;
-        right: 15px;
-        bottom: 15px;
-        z-index: 9998;
 
-        display: none;
+    #custom-chat-launcher,
+    #embeddedMessagingConversationButton,
+    button#embeddedMessagingConversationButton,
+    .embeddedMessagingConversationButton,
+    button.embeddedMessagingConversationButton,
+    button[class*="embeddedMessagingConversationButton"],
+    button.embeddedServiceSidebarMinimizedDefaultUI.sidebarHeader,
+    button.sidebarHeader {
+        overflow: visible !important;
+        isolation: isolate;
+    }
 
-        width: 78px;
-        height: 78px;
+    /*
+     * Shared production-style gradient border.
+     */
+    #custom-chat-launcher::before,
+    #embeddedMessagingConversationButton::before,
+    button#embeddedMessagingConversationButton::before,
+    .embeddedMessagingConversationButton::before,
+    button.embeddedMessagingConversationButton::before,
+    button[class*="embeddedMessagingConversationButton"]::before,
+    button.embeddedServiceSidebarMinimizedDefaultUI.sidebarHeader::before,
+    button.sidebarHeader::before {
+        position: absolute;
+
+        top: calc(var(--launcher-ring-size) * -1);
+        right: calc(var(--launcher-ring-size) * -1);
+        bottom: calc(var(--launcher-ring-size) * -1);
+        left: calc(var(--launcher-ring-size) * -1);
+
+        z-index: -1;
+
+        display: block;
 
         border-radius: 50%;
 
-        background:
-            linear-gradient(
-                135deg,
-                #0075bd 0%,
-                #006bb4 28%,
-                #4e4aa3 52%,
-                #893e98 72%,
-                #d5007f 100%
-            );
+        background: var(--launcher-gradient);
 
         box-shadow:
             0 5px 15px rgba(0, 59, 92, 0.22);
+
+        content: "";
 
         pointer-events: none;
     }
 
     /*
-     * Initial generic launcher.
-     *
-     * Centre:
-     * right: 22px + 32px = 54px
-     *
-     * Ring centre:
-     * right: 15px + 39px = 54px
+     * INITIAL CUSTOM LAUNCHER
      */
     #custom-chat-launcher {
         position: fixed;
-        right: 22px;
-        bottom: 22px;
-        z-index: 9999;
+        right: 24px;
+        bottom: 24px;
+        z-index: 999998;
 
         display: none;
 
-        width: 64px;
-        height: 64px;
+        width: var(--launcher-size);
+        height: var(--launcher-size);
 
         padding: 0;
 
@@ -105,6 +130,12 @@ title: Chat with us
             0 4px 12px rgba(0, 59, 92, 0.24);
     }
 
+    /*
+     * New speech image.
+     *
+     * The source is 48 × 48 but deliberately displayed
+     * at 38 × 38 to preserve white space.
+     */
     #custom-chat-launcher img {
         display: block;
 
@@ -115,6 +146,36 @@ title: Chat with us
     }
 
     /*
+     * ENHANCED WEB CHAT MINIMIZED BUTTON
+     *
+     * Salesforce controls whether this button is visible.
+     *
+     * Maximized conversation:
+     * button hidden, gradient hidden.
+     *
+     * Minimized conversation:
+     * button visible, gradient visible.
+     */
+    #embeddedMessagingConversationButton,
+    button#embeddedMessagingConversationButton,
+    .embeddedMessagingConversationButton,
+    button.embeddedMessagingConversationButton,
+    button[class*="embeddedMessagingConversationButton"] {
+        border-radius: 50% !important;
+        overflow: visible !important;
+    }
+
+    /*
+     * Legacy selectors retained because the production
+     * implementation uses these selectors.
+     */
+    button.embeddedServiceSidebarMinimizedDefaultUI.sidebarHeader,
+    button.sidebarHeader {
+        border-radius: 50% !important;
+        overflow: visible !important;
+    }
+
+    /*
      * CHOICE AND LOADING PANELS
      */
     #chat-choice-panel,
@@ -122,7 +183,7 @@ title: Chat with us
         position: fixed;
         right: 24px;
         bottom: 24px;
-        z-index: 10002;
+        z-index: 999999;
 
         display: none;
 
@@ -319,6 +380,9 @@ title: Chat with us
         opacity: 0.65;
     }
 
+    /*
+     * OPTION ICONS
+     */
     .chat-option-icon-shell,
     #loading-icon-shell {
         display: flex;
@@ -328,20 +392,14 @@ title: Chat with us
 
         flex: 0 0 50px;
 
+        padding: 6px;
+
         align-items: center;
         justify-content: center;
 
         border-radius: 50%;
 
-        background:
-            linear-gradient(
-                135deg,
-                #0075bd 0%,
-                #006bb4 28%,
-                #4e4aa3 52%,
-                #893e98 72%,
-                #d5007f 100%
-            );
+        background: var(--launcher-gradient);
     }
 
     .chat-option-icon-inner,
@@ -577,14 +635,9 @@ title: Chat with us
     }
 
     @media (max-width: 600px) {
-        #chat-launcher-ring {
-            right: 10px;
-            bottom: 10px;
-        }
-
         #custom-chat-launcher {
-            right: 17px;
-            bottom: 17px;
+            right: 18px;
+            bottom: 18px;
         }
 
         #chat-choice-panel,
@@ -606,14 +659,6 @@ title: Chat with us
         }
     }
 </style>
-
-
-<!-- FRONTEND GRADIENT RING -->
-
-<div
-    id="chat-launcher-ring"
-    aria-hidden="true"
-></div>
 
 
 <!-- INITIAL CUSTOM LAUNCHER -->
@@ -681,6 +726,8 @@ title: Chat with us
 
     <div id="chat-options">
 
+        <!-- AGENTFORCE -->
+
         <button
             class="chat-option"
             type="button"
@@ -691,12 +738,14 @@ title: Chat with us
                 aria-hidden="true"
             >
                 <span class="chat-option-icon-inner">
+
                     <svg viewBox="0 0 24 24">
                         <path
                             d="M13.1 2L6.6 12.2H11L9.9 22L17.4 10.4H13L13.1 2Z"
                             fill="currentColor"
                         ></path>
                     </svg>
+
                 </span>
             </span>
 
@@ -722,6 +771,9 @@ title: Chat with us
             </span>
         </button>
 
+
+        <!-- EINSTEIN -->
+
         <button
             class="chat-option"
             type="button"
@@ -732,6 +784,7 @@ title: Chat with us
                 aria-hidden="true"
             >
                 <span class="chat-option-icon-inner">
+
                     <svg viewBox="0 0 24 24">
                         <g
                             fill="none"
@@ -772,6 +825,7 @@ title: Chat with us
                             <path d="M9 15h6"></path>
                         </g>
                     </svg>
+
                 </span>
             </span>
 
@@ -973,11 +1027,6 @@ title: Chat with us
         }
     };
 
-    var launcherRing =
-        document.getElementById(
-            "chat-launcher-ring"
-        );
-
     var launcher =
         document.getElementById(
             "custom-chat-launcher"
@@ -1058,9 +1107,6 @@ title: Chat with us
     var initializationTimer =
         null;
 
-    var conversationOpen =
-        false;
-
     function getSelectedBotFromURL() {
         var parameters =
             new URLSearchParams(
@@ -1105,32 +1151,6 @@ title: Chat with us
         return url.toString();
     }
 
-    function showRing() {
-        launcherRing.style.display =
-            "block";
-    }
-
-    function hideRing() {
-        launcherRing.style.display =
-            "none";
-    }
-
-    /*
-     * Generic state:
-     * ring + custom launcher.
-     */
-    function showGenericLauncher() {
-        launcher.style.display =
-            "flex";
-
-        showRing();
-    }
-
-    function hideGenericLauncher() {
-        launcher.style.display =
-            "none";
-    }
-
     function openChoicePanel() {
         choicePanel.classList.add(
             "is-open"
@@ -1140,8 +1160,8 @@ title: Chat with us
             "is-open"
         );
 
-        hideGenericLauncher();
-        hideRing();
+        launcher.style.display =
+            "none";
     }
 
     function closeChoicePanel() {
@@ -1149,7 +1169,8 @@ title: Chat with us
             "is-open"
         );
 
-        showGenericLauncher();
+        launcher.style.display =
+            "flex";
 
         launcher.focus();
     }
@@ -1159,7 +1180,9 @@ title: Chat with us
     ) {
         Array.prototype.forEach.call(
             chatOptions,
-            function (option) {
+            function (
+                option
+            ) {
                 option.disabled =
                     disabled;
             }
@@ -1170,7 +1193,9 @@ title: Chat with us
         botKey
     ) {
         var config =
-            BOT_CONFIG[botKey];
+            BOT_CONFIG[
+                botKey
+            ];
 
         choicePanel.classList.remove(
             "is-open"
@@ -1180,8 +1205,8 @@ title: Chat with us
             "is-open"
         );
 
-        hideGenericLauncher();
-        hideRing();
+        launcher.style.display =
+            "none";
 
         loadingTitle.textContent =
             config.title;
@@ -1273,7 +1298,11 @@ title: Chat with us
     function selectBot(
         botKey
     ) {
-        if (!BOT_CONFIG[botKey]) {
+        if (
+            !BOT_CONFIG[
+                botKey
+            ]
+        ) {
             return;
         }
 
@@ -1295,7 +1324,9 @@ title: Chat with us
             return;
         }
 
-        if (launchStarted) {
+        if (
+            launchStarted
+        ) {
             return;
         }
 
@@ -1320,8 +1351,6 @@ title: Chat with us
         launchStarted =
             true;
 
-        hideRing();
-
         embeddedservice_bootstrap
             .utilAPI
             .launchChat()
@@ -1330,26 +1359,14 @@ title: Chat with us
 
                 hideLoadingPanel();
 
-                hideGenericLauncher();
-
-                /*
-                 * The chat starts maximized.
-                 * The maximized Salesforce window sits above
-                 * the low-z-index ring.
-                 *
-                 * Keep the ring rendered underneath so it is
-                 * immediately visible when the native button
-                 * returns after minimization.
-                 */
-                showRing();
+                launcher.style.display =
+                    "none";
             })
             .catch(function (
                 error
             ) {
                 launchStarted =
                     false;
-
-                hideRing();
 
                 showError(
                     error &&
@@ -1369,12 +1386,6 @@ title: Chat with us
 
                 clearTimer();
 
-                /*
-                 * Do not call hideChatButton().
-                 *
-                 * Salesforce needs to own and restore this
-                 * button after the user minimizes the chat.
-                 */
                 if (
                     launchRequested
                 ) {
@@ -1389,29 +1400,18 @@ title: Chat with us
         window.addEventListener(
             "onEmbeddedMessagingConversationOpened",
             function () {
-                conversationOpen =
-                    true;
-
                 clearTimer();
 
                 hideLoadingPanel();
 
-                hideGenericLauncher();
-
-                /*
-                 * Ring remains behind the maximized Salesforce
-                 * window because it has a low z-index.
-                 */
-                showRing();
+                launcher.style.display =
+                    "none";
             }
         );
 
         window.addEventListener(
             "onEmbeddedMessagingConversationClosed",
             function () {
-                conversationOpen =
-                    false;
-
                 clearTimer();
 
                 window.location.replace(
@@ -1434,11 +1434,8 @@ title: Chat with us
                     "en_US";
 
             /*
-             * Salesforce expects:
+             * Salesforce format:
              * "bottom,right"
-             *
-             * The native minimized launcher will be centred
-             * over the fixed gradient ring.
              */
             embeddedservice_bootstrap
                 .settings
@@ -1446,11 +1443,10 @@ title: Chat with us
                     "24px,24px";
 
             /*
-             * IMPORTANT:
+             * Keep Salesforce's native launcher available.
              *
-             * Keep the native button available.
-             * Salesforce automatically hides the button when
-             * maximized and restores it after minimization.
+             * Salesforce hides it while maximized and returns
+             * it when the chat is minimized.
              */
             embeddedservice_bootstrap
                 .settings
@@ -1471,8 +1467,6 @@ title: Chat with us
         ) {
             launchRequested =
                 false;
-
-            hideRing();
 
             showError(
                 error &&
@@ -1525,8 +1519,6 @@ title: Chat with us
                 launchRequested =
                     false;
 
-                hideRing();
-
                 showError(
                     config.name +
                     " could not be loaded."
@@ -1545,8 +1537,6 @@ title: Chat with us
                     ) {
                         launchRequested =
                             false;
-
-                        hideRing();
 
                         showError(
                             config.name +
@@ -1654,12 +1644,13 @@ title: Chat with us
     if (
         selectedBot
     ) {
-        hideGenericLauncher();
-        hideRing();
+        launcher.style.display =
+            "none";
 
         loadSelectedDeployment();
     } else {
-        showGenericLauncher();
+        launcher.style.display =
+            "flex";
     }
 })();
 </script>
